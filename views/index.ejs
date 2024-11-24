@@ -12,7 +12,7 @@
       <h1 class="brand">Аквасвіт</h1>
       <div class="contact">
         <a href="tel:0445001212">(044) 500-12-12</a>
-        <span>Графік роботи</span>
+        <span>Графік роботи: Пн-Пт 9:00-18:00</span>
       </div>
       <a href="/order" class="btn order-btn">Замовити воду</a>
     </div>
@@ -26,17 +26,41 @@
     <section class="products">
       <% products.forEach(product => { %>
         <div class="product">
-          <img src="<%= product.image %>" alt="<%= product.name %>">
-          <h3><%= product.name %></h3>
-          <p><%= product.description %></p>
+          <img src="<%= product.Image_name %>" alt="<%= product.Product_name %>">
+          <h3><%= product.Product_name %></h3>
+          <p><%= product.Details %></p>
           <div class="price">
-            <span><%= product.regularPrice %> грн</span>
-            <span class="discount"><%= product.discountPrice %> грн</span>
+            <span>Кількість: <%= product.Quantity %></span>
+            <span>Ціна: <%= product.Price_per_unit %> грн</span>
           </div>
+            <button type="button" class="btn btn-primary" data-product-id="<%= product.Product_id %>">
+              Додати в кошик
+            </button>
         </div>
       <% }); %>
     </section>
+    
   </main>
+  <script>
+    document.querySelectorAll('.btn-primary').forEach(button => {
+  button.addEventListener('click', function() {
+
+    const productId = this.dataset.productId;
+    
+    console.log(this.dataset);
+    fetch(`/busket/add-to-busket/${productId}`, {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Response:', data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  });
+});
+  </script>
 
   <footer>
     <div class="contact-form">

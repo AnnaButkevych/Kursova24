@@ -31,24 +31,35 @@ CREATE TABLE Payment_type (
 CREATE TABLE Orders (
     Orders_id INT PRIMARY KEY AUTO_INCREMENT,
     Date DATE NOT NULL,
-    Status ENUM('очікує оплати', 'виконане', 'скасоване') NOT NULL,
-    Sum DECIMAL(10, 2) NOT NULL,
-    Payment_type INT,
+    Status VARCHAR(50),
+    Sum DECIMAL(10, 2),
+    Payment_type_id INT,
     Customer_id INT,
     Delivery_id INT,
-    FOREIGN KEY (Payment_type) REFERENCES Payment_type(Payment_type_id),
+    Busket_id INT,
+    FOREIGN KEY (Payment_type_id) REFERENCES Payment_type(Payment_type_id),
     FOREIGN KEY (Customer_id) REFERENCES Customer(Customer_id),
-    FOREIGN KEY (Delivery_id) REFERENCES Delivery(Delivery_id)
+    FOREIGN KEY (Delivery_id) REFERENCES Delivery(Delivery_id),
+    FOREIGN KEY (Busket_id) REFERENCES Busket(Busket_id)
+);
+
+CREATE TABLE Busket (
+    Busket_id INT PRIMARY KEY AUTO_INCREMENT,
+    Session_id VARCHAR(100),
+    Order_Water_id INT,
+    IsProcessed BOOLEAN,
+    FOREIGN KEY (Order_Water_id) REFERENCES Order_Water(Order_Water_id)
 );
 
 CREATE TABLE Order_Water (
+    Order_Water_id INT PRIMARY KEY AUTO_INCREMENT,
     Orders_id INT,
     Price_change_id INT,
-    Amount DECIMAL(10, 2) NOT NULL,
-    PRIMARY KEY (Orders_id, Price_change_id),
+    Amount INT NOT NULL,
     FOREIGN KEY (Orders_id) REFERENCES Orders(Orders_id),
     FOREIGN KEY (Price_change_id) REFERENCES Price_change(Price_change_id)
 );
+
 
 CREATE TABLE Warehouse (
     Warehouse_id INT PRIMARY KEY AUTO_INCREMENT,

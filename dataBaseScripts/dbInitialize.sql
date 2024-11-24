@@ -24,12 +24,14 @@ INSERT INTO Payment_type (Type, Details) VALUES
 ('картка', 'Visa/MasterCard'),
 ('PayPal', 'Міжнародні платежі');
 
-INSERT INTO Orders (Date, Status, Sum, Payment_type, Customer_id, Delivery_id) VALUES
-('2024-11-01', 'очікує оплати', 1000.00, 1, 1, 1),
-('2024-11-02', 'виконане', 1500.50, 2, 2, 2),
-('2024-11-03', 'скасоване', 1200.75, 3, 3, 3),
-('2024-11-04', 'очікує оплати', 2000.00, 1, 4, 4),
-('2024-11-05', 'виконане', 1750.25, 2, 5, 5);
+INSERT INTO Orders (Date, Status, Sum, Payment_type_id, Customer_id, Delivery_id, Busket_id)
+VALUES
+('2024-11-01', 'Pending', 150.50, 1, 1, 1, 1),
+('2024-11-02', 'Completed', 200.75, 2, 2, 2, 2),
+('2024-11-03', 'Cancelled', 120.00, 3, 3, 3, 3),
+('2024-11-04', 'Pending', 250.00, 1, 4, 1, 4),
+('2024-11-05', 'Completed', 300.25, 2, 5, 2, 5);
+
 
 INSERT INTO Warehouse (Type, Address) VALUES
 ('Основний', 'Київ, вул. Заводська, 7'),
@@ -55,12 +57,14 @@ INSERT INTO Price_change (ProductsOnWarehouse_id, Price_per_unit, Change_date) V
 (4, 9.50, '2024-11-10'),
 (5, 11.00, '2024-11-20');
 
-INSERT INTO Order_Water (Orders_id, Price_change_id, Amount) VALUES
-(1, 1, 100),
-(2, 2, 150),
-(3, 3, 120),
-(4, 4, 200),
-(5, 5, 175);
+INSERT INTO Order_Water (Orders_id, Price_change_id, Amount)
+VALUES
+(1, 1, 5),
+(2, 2, 10),
+(3, 3, 3),
+(4, 4, 8),
+(5, 5, 12);
+
 
 INSERT INTO WaterStation (ProductsOnWarehouse_id, Filtration_date, Volume) VALUES
 (1, '2024-10-20', 500.00),

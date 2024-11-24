@@ -1,10 +1,26 @@
 const express = require('express');
 const path = require('path');
-const router = express.Router(); // Додаємо маршрутизатор
-
+const router = express.Router();
+const session = require('express-session');
+const { runDBCommand } = require('./db/connection'); // Шлях до connection.js
 
 const app = express();
 const PORT = 3000;
+
+app.use(session({
+  secret: 'your-secret-key',  // Secret key for session encryption
+  resave: false,              // Don't save session if not modified
+  saveUninitialized: true,    // Save session even if it hasn't been initialized
+  cookie: { secure: false }   // Set secure to true for HTTPS (default is false)
+}));
+
+app.use((req, res, next) => {
+  if (!req.session.sessionId) {
+    // Automatically set a session ID if it doesn't exist
+    req.session.sessionId = generateSessionId();  // You can customize this ID
+  }
+  next();
+});
 
 // Middleware для парсингу форми
 app.use(express.urlencoded({ extended: true }));
@@ -16,59 +32,74 @@ app.set('view engine', 'ejs');
 // Налаштування статичних файлів (CSS, зображення тощо)
 app.use(express.static(path.join(__dirname, 'public')));
 
-const orderRoute = require('./routes/order');
-app.use(orderRoute);
 
-// Маршрут для головної сторінки
-router.get('/', (req, res) => {
-  const products = [
-    {
-      name: 'Преміум',
-      image: '/images/premium.png',
-      description: 'Вода питна Преміум 1 бутель найвищої категорії якості. Проходить 7 етапів очищення.',
-      regularPrice: '180.00',
-      discountPrice: '160.00'
-    },
-    {
-      name: 'Срібна',
-      image: '/images/silver.png',
-      description: 'Вода найвищої категорії якості, має оптимальний рівень мінералізації.',
-      regularPrice: '160.00',
-      discountPrice: '140.00'
-    },
-    {
-      name: 'Пом\'якшена',
-      image: '/images/softened.png',
-      description: 'Вода питна Пом\'якшена найвищої категорії якості, проходить 7 етапів очищення.',
-      regularPrice: '160.00',
-      discountPrice: '140.00'
+// Product list controller
+app.get('/', async (req, res) => {
+  try {
+    const session_id = req.session.sessionId;
+    console.log("Session ID:", session_id);
+
+    const query = `SELECT 
+    p.Product_id,
+    p.Product_name,
+    p.Storage_unit,
+    p.Details,
+    p.Image_name,
+    pw.Quantity,
+    pc.Price_per_unit
+    FROM
+    Product p
+    JOIN
+    ProductsOnWarehouse pw ON p.Product_id = pw.Product_id
+    JOIN
+    Price_change pc ON pw.ProductsOnWarehouse_id = pc.ProductsOnWarehouse_id
+    WHERE
+        pc.Change_date = (
+            SELECT MAX(Change_date)
+            FROM Price_change pc_sub
+            WHERE pc_sub.ProductsOnWarehouse_id = pc.ProductsOnWarehouse_id
+        );`;
+
+    const products = await runDBCommand(query);
+    console.log(products)
+    if (!products || products.length === 0) {
+      return res.status(404).json({ message: 'No products found' });
     }
-  ];
 
-  res.render('index', { 
-    title: 'Аквасвіт - Корисна вода',
-    products
-  });
+    res.render('index', {
+      title: 'Аквасвіт - Корисна вода',
+      products: products
+    });
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
 });
 
-// Обробка запиту з форми
-router.post('/request', (req, res) => {
-  const { phone } = req.body;
-  console.log(`Новий запит води від номера: ${phone}`);
-  res.send(`
-    <h1>Дякуємо! Ми зв'яжемося з вами за номером: ${phone}</h1>
-    <a href="/">Повернутися на головну</a>
-  `);
-});
 
-// Підключаємо маршрутизатор до основного додатку
+// Підключення маршруту для замовлень
+const orderRoute = require('./routes/order');
+app.use('/order', orderRoute);
+
+const busketRoutes = require('./routes/busket');
+app.use('/busket', busketRoutes);
+
+const productRoutes = require("./routes/product");
+app.use("/products", productRoutes);
+
 app.use('/', router);
 
 // Запуск сервера
 app.listen(PORT, async () => {
   console.log(`Сервер запущено на http://localhost:${PORT}`);
   
-  // Динамічний імпорт ES-модуля "open"
+  // Динамічний імпорт модуля "open" для автоматичного відкриття в браузері
   const open = await import('open');
   await open.default(`http://localhost:${PORT}`);
 });
+
+function generateSessionId() {
+  return 'session-' + Math.random().toString(36).substr(2, 9);  // Example of custom session ID generation
+}
+
+module.exports = router;

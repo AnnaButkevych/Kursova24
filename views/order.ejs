@@ -30,14 +30,29 @@
       <h2>Форма для замовлення води</h2>
       <form action="/create_order" method="POST" class="mt-4">
         <div class="mb-3">
-          <label for="customerName" class="form-label">Ім'я замовника</label>
-          <input type="text" class="form-control" id="customerName" name="customerName" required>
-        </div>
-
-        <div class="mb-3">
-          <label for="customerPhone" class="form-label">Номер телефону</label>
-          <input type="tel" class="form-control" id="customerPhone" name="customerPhone" required>
-        </div>
+            <label for="customerName" class="form-label">Ім'я замовника</label>
+            <input type="text" class="form-control" id="customerName" name="customerName" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="customerSurname" class="form-label">Прізвище замовника</label>
+            <input type="text" class="form-control" id="customerSurname" name="customerSurname" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="customerPhone" class="form-label">Номер телефону</label>
+            <input type="tel" class="form-control" id="customerPhone" name="customerPhone" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="customerAddress" class="form-label">Адреса</label>
+            <input type="text" class="form-control" id="customerAddress" name="customerAddress">
+          </div>
+          
+          <div class="mb-3">
+            <label for="customerEmail" class="form-label">Електронна пошта</label>
+            <input type="email" class="form-control" id="customerEmail" name="customerEmail">
+          </div>
 
         <div class="mb-3">
           <label for="productSelect" class="form-label">Оберіть продукт</label>
@@ -57,8 +72,26 @@
           </select>
         </div>
 
-        <button type="submit" class="btn btn-primary">Оформити замовлення</button>
+        <button type="submit" class="btn btn-primary">Додати в кошик</button>
       </form>
+
+      <!-- Відображення кошика -->
+      <h3 class="my-4">Ваш кошик:</h3>
+      <% if (busketItems && busketItems.length > 0) { %>
+        <ul class="list-group">
+          <% busketItems.forEach(item => { %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span><%= item.product_name %> - <%= item.product_price %> грн</span>
+              <form action="/remove_from_busket/<%= item.id %>" method="POST">
+                <button type="submit" class="btn btn-danger btn-sm">Видалити</button>
+              </form>
+            </li>
+          <% }); %>
+        </ul>
+      <% } else { %>
+        <p>Ваш кошик порожній.</p>
+      <% } %>
+
     </div>
   </main>
 

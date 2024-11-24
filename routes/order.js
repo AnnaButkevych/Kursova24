@@ -2,6 +2,11 @@ const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
 
-router.get('/order', orderController.getOrders);
+router.get('/', orderController.getOrders);
+router.post('/add', orderController.addOrder);
+router.post('/edit/:id', orderController.editOrder);
+router.delete('/delete/:id', orderController.deleteOrder);
+router.get('/statistics', orderController.getOrderStatistics);
+router.get('/report', orderController.generateReport);
 
 module.exports = router;
