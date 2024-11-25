@@ -39,7 +39,7 @@ app.get('/', async (req, res) => {
     const session_id = req.session.sessionId;
     console.log("Session ID:", session_id);
 
-    const query = `SELECT 
+    const productsQuery = `SELECT 
     p.Product_id,
     p.Product_name,
     p.Storage_unit,
@@ -60,15 +60,17 @@ app.get('/', async (req, res) => {
             WHERE pc_sub.ProductsOnWarehouse_id = pc.ProductsOnWarehouse_id
         );`;
 
-    const products = await runDBCommand(query);
-    console.log(products)
+    const products = await runDBCommand(productsQuery);
+
+
     if (!products || products.length === 0) {
       return res.status(404).json({ message: 'No products found' });
     }
 
     res.render('index', {
       title: 'Аквасвіт - Корисна вода',
-      products: products
+      products: products,
+
     });
   } catch (error) {
     console.error("Error fetching products:", error);

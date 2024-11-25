@@ -17,9 +17,27 @@ module.exports = {
                  Delivery_id
           FROM Orders`;
         
-        const query = `SELECT * FROM Busket WHERE session_id = ${mysql.escape(session_id)}`;
-        const busketItems = await runDBCommand(query);
-        
+            // Query to fetch basket items
+        const busketQuery = `SELECT 
+            b.Busket_id AS id,
+            p.Product_name AS product_name,
+            pc.Price_per_unit AS product_price,
+            b.Quantity AS quantity,
+            (pc.Price_per_unit * b.Quantity) AS total_price
+        FROM 
+            Busket b 
+        JOIN Product p ON b.Order_Water_id = p.Product_id
+        LEFT JOIN Price_change pc ON p.Product_id = pc.ProductsOnWarehouse_id
+        WHERE 
+            b.Session_id = '${session_id}' 
+            AND pc.Change_date = (
+            SELECT MAX(Change_date)
+            FROM Price_change
+            WHERE ProductsOnWarehouse_id = pc.ProductsOnWarehouse_id
+            );`;
+        const busketItems = await runDBCommand(busketQuery);
+            console.log(busketItems)
+            
         // SQL-запит для отримання продуктів
         const productsQuery = `
           SELECT Product_id AS id, 
@@ -66,32 +84,43 @@ module.exports = {
       console.error(err);
       res.status(500).send("Error adding order");
     }
-  },
-
-  // Редагування замовлення
-  editOrder: async (req, res) => {
+    },
+  
+// Редагування замовлення
+    editOrder: async (req, res) => { 
     try {
-      const { id } = req.params;
       const { Date, Status, Sum, Payment_type, Customer_id, Delivery_id } = req.body;
-
+  
+      // Спочатку додаємо нове замовлення
       const query = `
-        UPDATE Orders
-        SET Date = ?, 
-            Status = ?, 
-            Sum = ?, 
-            Payment_type = ?, 
-            Customer_id = ?, 
-            Delivery_id = ?
-        WHERE Orders_id = ?`;
-
-      await runDBCommand(query, [Date, Status, Sum, Payment_type, Customer_id, Delivery_id, id]);
-      res.status(200).send("Order updated successfully");
+        INSERT INTO Orders (Date, Status, Sum, Payment_type, Customer_id, Delivery_id)
+        VALUES (?, ?, ?, ?, ?, ?)`;
+  
+      const result = await runDBCommand(query, [Date, Status, Sum, Payment_type, Customer_id, Delivery_id]);
+      const newOrderId = result.insertId; // отримуємо ID нового замовлення
+  
+      // Далі переносимо продукти з кошика в замовлення
+      const busketQuery = `SELECT * FROM Busket WHERE session_id = ${mysql.escape(req.session.sessionId)}`;
+      const busketItems = await runDBCommand(busketQuery);
+  
+      // Додаємо кожен продукт з кошика в таблицю Order_Products
+      for (const item of busketItems) {
+        const orderProductQuery = `
+          INSERT INTO Order_Products (Order_id, Product_id, Quantity)
+          VALUES (?, ?, ?)`;
+        await runDBCommand(orderProductQuery, [newOrderId, item.Product_id, item.Quantity]);
+      }
+  
+      // Тепер очищуємо кошик після додавання замовлення
+      const deleteBusketQuery = `DELETE FROM Busket WHERE session_id = ${mysql.escape(req.session.sessionId)}`;
+      await runDBCommand(deleteBusketQuery);
+  
+      res.status(200).send("Order added successfully");
     } catch (err) {
       console.error(err);
-      res.status(500).send("Error updating order");
+      res.status(500).send("Error adding order");
     }
   },
-
   // Видалення замовлення
   deleteOrder: async (req, res) => {
     try {
