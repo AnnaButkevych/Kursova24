@@ -46,7 +46,7 @@
               busketItems.forEach(item => {
                 totalSum += parseFloat(item.total_price || 0);
             %>
-                <tr>
+                <tr id="product-item-<%= item.id %>">
                   <td>
                     <div class="d-flex align-items-center gap-3">
                       <img src="/images/products/<%= item.id %>.jpg" alt="<%= item.product_name || '' %>" 
@@ -61,7 +61,8 @@
                       </div>
                     </div>
                   </td>
-                  <td class="text-center"><%= (Number(item.product_price) || 0).toFixed(2) %>грн.</td>
+                  <td class="text-center" id="product-price-<%= item.id %>" data-price="<%= (Number(item.product_price) || 0).toFixed(2) %>"> 
+                    <%= (Number(item.product_price) || 0).toFixed(2) %>грн.</td>
                   <td class="text-center">
                     <div class="d-flex justify-content-center align-items-center gap-2">
                         <button onclick="updateQuantity('<%= item.id %>', -1)" class="btn btn-outline-secondary btn-sm px-2 py-1">-</button>
@@ -99,93 +100,71 @@
         </table>
       </div>
     </div>
-   
-   <script>
-   async function updateQuantity(itemId, change) {
-    try {
-      const response = await fetch('/api/cart/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          itemId,
-          change
-        })
-      });
-   
-      const data = await response.json();
-      
-      if (data.success) {
-        // Оновлюємо кількість
-        const quantityElement = document.getElementById(`quantity-${itemId}`);
-        const newQuantity = parseInt(quantityElement.textContent) + change;
-        if (newQuantity >= 0) {
-          quantityElement.textContent = newQuantity;
-   
-          // Оновлюємо ціну товару
-          const totalElement = document.getElementById(`total-${itemId}`);
-          totalElement.textContent = `${data.itemTotal.toFixed(2)}грн.`;
-   
-          // Оновлюємо загальну суму
-          const subtotalElement = document.getElementById('subtotal');
-        totalElement = document.getElementById('total');
-          subtotalElement.textContent = `${data.cartTotal.toFixed(2)}грн.`;
-          totalElement.textContent = `${data.cartTotal.toFixed(2)}грн.`;
+
+    <script>
+        function updateQuantity(productId, change) {
+        // Знайти елементи, пов'язані з продуктом
+        const quantityElement = document.getElementById(`quantity-${productId}`);
+        const productPriceElement = document.getElementById(`product-price-${productId}`);
+        const totalPriceElement = document.getElementById(`total-${productId}`);
+        let quantity = parseInt(quantityElement.innerText) || 0;
+        quantity += change;
+
+//todo^ update quantity, передавати на фронт максмімум квонтіті, обмеження не встановлювати кількість максимальної if
+
+        // Перевірка, що кількість не менше нуля
+        if (quantity < 0) quantity = 0;
+        const totalText = totalPriceElement.innerText || totalPriceElement.textContent;
+
+        // Вилучаємо число без "грн."
+        const totalValue = parseFloat(totalText.replace('грн.', '').trim());
+        // Оновлюємо кількість на сторінці
+        quantityElement.innerText = quantity;
+
+        // Оновлюємо ціну продукту на основі його початкової ціни
+
+            const productPrice = parseFloat(productPriceElement.textContent.replace('грн.', '').trim()) || 0;
+            const totalPrice = (productPrice * quantity).toFixed(2);
+            totalPriceElement.innerText = `${totalPrice}грн.`;
+
+        // Оновлюємо загальну суму
+        updateTotal();
         }
-      } else {
-        console.error('Failed to update quantity');
-      }
-    } catch (error) {
-      console.error('Error updating quantity:', error);
-    }
-   }
-   
-   async function removeItem(itemId) {
-    try {
-      const response = await fetch('/api/cart/remove', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          itemId
-        })
-      });
-   
-      const data = await response.json();
       
-      if (data.success) {
-        // Видаляємо рядок з таблиці
-        const row = document.querySelector(`tr:has(#quantity-${itemId})`);
-        if (row) {
-          row.remove();
-   
-          // Оновлюємо загальну суму
+        // Видалення продукту з кошика
+        function removeItem(productId) {
+          const row = document.getElementById(`product-item-${productId}`);
+          if (row) {
+            row.remove();
+            updateTotal();
+          }
+
+//todo^ call delete endpoint
+
+        }
+      
+        function makeOrder(){
+
+        }
+        
+        // Оновлення загальної суми
+        function updateTotal() {
+          let subtotal = 0;
+          const totalElements = document.querySelectorAll('[id^="total-"]');
+          totalElements.forEach(element => {
+            subtotal += parseFloat(element.innerText.replace('грн.', '').trim()) || 0;
+          });
+      
           const subtotalElement = document.getElementById('subtotal');
           const totalElement = document.getElementById('total');
-          subtotalElement.textContent = `${data.cartTotal.toFixed(2)}грн.`;
-          totalElement.textContent = `${data.cartTotal.toFixed(2)}грн.`;
-   
-          // Якщо кошик порожній, показуємо відповідне повідомлення
-          if (data.cartTotal === 0) {
-            const tbody = document.querySelector('tbody');
-            tbody.innerHTML = `
-              <tr>
-                <td colspan="5" class="text-center py-4">Ваш кошик порожній.</td>
-              </tr>
-            `;
-            document.querySelector('tfoot').style.display = 'none';
+          
+          if (subtotalElement && totalElement) {
+            subtotalElement.innerText = `${subtotal.toFixed(2)}грн.`;
+            totalElement.innerText = `${subtotal.toFixed(2)}грн.`;
           }
         }
-      } else {
-        console.error('Failed to remove item');
-      }
-    } catch (error) {
-      console.error('Error removing item:', error);
-    }
-   }
-   </script>
+      </script>
+      
 
     <div class="container my-5">
       <h2>Форма для замовлення води</h2>
