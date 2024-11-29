@@ -49,7 +49,7 @@
                 <tr id="product-item-<%= item.id %>">
                   <td>
                     <div class="d-flex align-items-center gap-3">
-                      <img src="/images/products/<%= item.id %>.jpg" alt="<%= item.product_name || '' %>" 
+                      <img src="/images/<%=item.Image_name %>" alt="<%= item.product_name || '' %>" 
                            style="width: 80px; height: 80px; object-fit: contain;">
                       <div>
                         <div><%= item.product_name || '' %></div>
@@ -61,7 +61,8 @@
                       </div>
                     </div>
                   </td>
-                  <td class="text-center" id="product-price-<%= item.id %>" data-price="<%= (Number(item.product_price) || 0).toFixed(2) %>"> 
+                  <td class="text-center" id="product-price-<%= item.id %>" data-price="<%= (Number(item.product_price) || 0).toFixed(2) %>"
+                    data-max-quantity="<%= item.max_quantity || Infinity %>"> 
                     <%= (Number(item.product_price) || 0).toFixed(2) %>грн.</td>
                   <td class="text-center">
                     <div class="d-flex justify-content-center align-items-center gap-2">
@@ -111,8 +112,10 @@
         quantity += change;
 
 //todo^ update quantity, передавати на фронт максмімум квонтіті, обмеження не встановлювати кількість максимальної if
+// sql script for updateQuantity on back
+        const maxQuantity = parseInt(productPriceElement.dataset.maxQuantity) || Infinity;
 
-        // Перевірка, що кількість не менше нуля
+        if (quantity > maxQuantity) quantity = maxQuantity;
         if (quantity < 0) quantity = 0;
         const totalText = totalPriceElement.innerText || totalPriceElement.textContent;
 
@@ -127,21 +130,56 @@
             const totalPrice = (productPrice * quantity).toFixed(2);
             totalPriceElement.innerText = `${totalPrice}грн.`;
 
+            fetch(`/busket/${productId}?quantity=${encodeURIComponent(quantity)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            })
+            .then(response => response.json())
+            .then(data => {
+            if (data.message === 'Busket item updated successfully') {
+                console.log('Кількість оновлено на сервері');
+            } else {
+                console.error('Помилка оновлення на сервері:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Помилка при відправці запиту:', error);
+        });
+
         // Оновлюємо загальну суму
         updateTotal();
         }
       
         // Видалення продукту з кошика
         function removeItem(productId) {
-          const row = document.getElementById(`product-item-${productId}`);
-          if (row) {
-            row.remove();
-            updateTotal();
-          }
-
-//todo^ call delete endpoint
-
+        // Відправка запиту на видалення
+        fetch(`/busket/${productId}`, {
+            method: 'DELETE',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+        })
+            .then((response) => {
+            if (response.ok) {
+                // Видаляємо елемент із таблиці
+                const row = document.getElementById(`product-item-${productId}`);
+                if (row) {
+                row.remove();
+                updateTotal();
+                }
+            } else {
+                response.json().then((data) => {
+                console.error('Помилка при видаленні:', data.message);
+                });
+            }
+            })
+            .catch((error) => console.error('Помилка запиту:', error));
         }
+
+
+//todo^ call delete endpoint sql script, на фронті удалять елемент
       
         function makeOrder(){
 

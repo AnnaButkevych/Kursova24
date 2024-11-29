@@ -39,41 +39,44 @@ const busketController = {
     }
   },
 
-  // Update an existing busket item
-  async update(req, res) {
-    try {
-      const { id } = req.params;
-      const { IsProcessed } = req.body;
+    async updateQuantity(req, res) {
+        try {
+            const { id } = req.params;
+            const { quantity } = req.query;
+            console.log(req.query)
+            const result = await runDBCommand(
+                `UPDATE Busket SET Quantity = ${quantity} WHERE Busket_id = ${id}`
+            );
 
-      const busketItem = await Busket.findByPk(id);
-      if (!busketItem) {
-        return res.status(404).json({ message: 'Busket item not found' });
-      }
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'Busket item not found' });
+            }
 
-      busketItem.IsProcessed = IsProcessed;
-      await busketItem.save();
+            res.status(200).json({ message: 'Busket item updated successfully' });
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+            res.status(500).json({ message: 'Error updating busket item', error });
+        }
+    },
 
-      res.status(200).json(busketItem);
-    } catch (error) {
-      res.status(500).json({ message: 'Error updating busket item', error });
-    }
-  },
+    async delete(req, res) {
+        try {
+            const { id } = req.params;
 
-  // Delete a busket item
-  async delete(req, res) {
-    try {
-      const { id } = req.params;
-      const busketItem = await Busket.findByPk(id);
-      if (!busketItem) {
-        return res.status(404).json({ message: 'Busket item not found' });
-      }
+            const result = await runDBCommand(
+                `DELETE FROM Busket WHERE Busket_id = ${id}`
+            );
 
-      await busketItem.destroy();
-      res.status(200).json({ message: 'Busket item deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ message: 'Error deleting busket item', error });
-    }
-  }
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'Busket item not found' });
+            }
+
+            res.status(200).json({ message: 'Busket item deleted successfully' });
+        } catch (error) {
+            console.error('Error deleting busket item:', error);
+            res.status(500).json({ message: 'Error deleting busket item', error });
+        }
+    },  
 };
 
 module.exports = busketController;

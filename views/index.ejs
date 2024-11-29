@@ -26,7 +26,7 @@
     <section class="products">
       <% products.forEach(product => { %>
         <div class="product">
-          <img src="<%= product.Image_name %>" alt="<%= product.Product_name %>">
+          <img src="/images/<%=product.Image_name%>" alt="<%= product.Product_name %>">
           <h3><%= product.Product_name %></h3>
           <p><%= product.Details %></p>
           <div class="price">
@@ -48,8 +48,8 @@
     const productId = this.dataset.productId;
     
     console.log(this.dataset);
-    fetch(`/busket/add-to-busket/${productId}`, {
-      method: 'GET',
+    fetch(`/busket/${productId}`, {
+      method: 'PUT',
     })
       .then(response => response.json())
       .then(data => {

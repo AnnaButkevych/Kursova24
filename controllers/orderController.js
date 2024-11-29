@@ -23,6 +23,7 @@ module.exports = {
             p.Product_name AS product_name,
             pc.Price_per_unit AS product_price,
             b.Quantity AS quantity,
+            p.Image_name,
             (pc.Price_per_unit * b.Quantity) AS total_price
         FROM 
             Busket b 
