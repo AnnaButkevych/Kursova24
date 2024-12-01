@@ -103,6 +103,14 @@
     </div>
 
     <script>
+            document.addEventListener('DOMContentLoaded', () => {
+          const titleElement = document.getElementById('page-title');
+          if (titleElement) {
+            titleElement.addEventListener('click', () => {
+              window.location.href = '/';
+            });
+          }
+        });
         function updateQuantity(productId, change) {
         // Знайти елементи, пов'язані з продуктом
         const quantityElement = document.getElementById(`quantity-${productId}`);

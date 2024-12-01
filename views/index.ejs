@@ -42,8 +42,17 @@
     
   </main>
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const titleElement = document.getElementById('page-title');
+      if (titleElement) {
+        titleElement.addEventListener('click', () => {
+          window.location.href = '/';
+        });
+      }
+    });
+
     document.querySelectorAll('.btn-primary').forEach(button => {
-  button.addEventListener('click', function() {
+    button.addEventListener('click', function() {
 
     const productId = this.dataset.productId;
     
