@@ -22,7 +22,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware для парсингу форми
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Встановлення EJS як шаблонізатора
@@ -32,7 +32,11 @@ app.set('view engine', 'ejs');
 // Налаштування статичних файлів (CSS, зображення тощо)
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+app.get('/resetSession', async (req, res) => {
+  req.session.destroy((err) => {
+    res.redirect('/') // will always fire after session is destroyed
+  })
+});
 // Product list controller
 app.get('/', async (req, res) => {
   try {

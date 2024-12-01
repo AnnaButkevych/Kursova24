@@ -70,22 +70,104 @@ module.exports = {
       }
   },
 
-  // Додавання нового замовлення
-  addOrder: async (req, res) => {
+  // Отримання сторінки додавання замовлення
+  getAddOrderPage: async (req, res) => {
     try {
-      const { Date, Status, Sum, Payment_type, Customer_id, Delivery_id } = req.body;
+        const customersQuery = `SELECT customer_id, name, surname FROM Customer`;
+        const deliveriesQuery = `SELECT delivery_id, delivery_address FROM Delivery`;
 
-      const query = `
-        INSERT INTO Orders (Date, Status, Sum, Payment_type, Customer_id, Delivery_id)
-        VALUES (?, ?, ?, ?, ?, ?)`;
+        const customers = await runDBCommand(customersQuery);
+        const deliveries = await runDBCommand(deliveriesQuery);
 
-      await runDBCommand(query, [Date, Status, Sum, Payment_type, Customer_id, Delivery_id]);
-      res.status(200).send("Order added successfully");
+        res.render("/order", { customers, deliveries }); // Рендеримо сторінку з переданими даними
     } catch (err) {
-      console.error(err);
-      res.status(500).send("Error adding order");
+        console.error("Error loading add order page:", err);
+        res.status(500).send("Сталася помилка при завантаженні сторінки.");
     }
-    },
+},
+
+// Додавання нового замовлення
+addOrder: async (req, res) => {
+    try {
+        const session_id = req.session.sessionId;
+        const { customerName, customerSurname, customerPhone, paymentType, customerAddress, customerEmail } = req.body;
+        console.log(req.body)
+        const getProductSumQuery = `SELECT distinct
+        SUM(b.quantity * COALESCE(pc.price_per_unit)) OVER (PARTITION BY b.Session_id) AS total_sum 
+    FROM Busket b
+    JOIN Product p ON b.Order_Water_id = p.Product_id
+    LEFT JOIN (
+        SELECT pc.*, ROW_NUMBER() OVER (PARTITION BY pc.ProductsOnWarehouse_id ORDER BY pc.Change_date DESC) AS rn
+        FROM Price_change pc
+    ) pc ON p.Product_id = pc.ProductsOnWarehouse_id AND pc.rn = 1
+    WHERE b.Session_id = '${session_id}'`;
+        
+        const total_sum = (await runDBCommand(getProductSumQuery))[0].total_sum;
+        console.log(total_sum)
+
+        if (total_sum < 0) {
+            return res.status(400).send("Сума замовлення не може бути від'ємною.");
+        }
+
+        const customerQuery = `
+            INSERT INTO Customer (name, surname, phone_number, address, email)
+            VALUES ('${customerName}', '${customerSurname}', '${customerPhone}', '${customerAddress}', '${customerEmail}')`;
+
+        const customerResult = await runDBCommand(customerQuery);
+
+        const deliveryQuery = `
+            INSERT INTO Delivery (delivery_address, courier_id)
+            VALUES ('${customerAddress}', '1')`;
+
+        const deliveryResult = await runDBCommand(deliveryQuery);
+
+        const customerId = parseInt(customerResult.insertId, 10);
+        const deliveryId = parseInt(deliveryResult.insertId, 10)
+        console.log(deliveryResult)
+
+        if (isNaN(customerId) || isNaN(deliveryId)) {
+            throw new Error('Invalid customerResult or deliveryResult. They must be valid integers.');
+        }
+
+        const setBusketIdQuery = `
+        SELECT busket_id
+        FROM Busket
+        WHERE Session_id = '${session_id}';
+        `;
+        const setBusketIdQueryResult = await runDBCommand(setBusketIdQuery);
+
+        const insertOrderQuery = `
+        INSERT INTO Orders (date, status, sum, Payment_type_id, customer_id, delivery_id, busket_id)
+        VALUES (NOW(), 'Pending', ${total_sum}, '${paymentType}', '${customerId}', '${deliveryId}', '${setBusketIdQueryResult[0].busket_id}');
+        `;
+
+        await runDBCommand(insertOrderQuery);
+
+                // Step 6: Reduce product quantities in the Products table based on the basket
+                const basketItemsQuery = `
+                SELECT p.Product_id, b.Quantity
+                FROM Busket b
+                JOIN Product p ON b.Order_Water_id = p.Product_id
+                WHERE b.Session_id = '${session_id}'`;
+            
+            const basketItems = await runDBCommand(basketItemsQuery);
+    
+            for (const item of basketItems) {
+    
+                const updateStockQuery = `
+                    UPDATE ProductsOnWarehouse
+                    SET Quantity = Quantity - ${item.Quantity}
+                    WHERE Product_id = ${item.Product_id}`;
+                await runDBCommand(updateStockQuery);
+                
+            }
+
+        res.status(200); 
+    } catch (err) {
+        console.error("Error adding order:", err);
+        res.status(500).send("Сталася помилка при додаванні замовлення.");
+    }
+},
   
 // Редагування замовлення
     editOrder: async (req, res) => { 

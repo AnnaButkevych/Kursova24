@@ -43,7 +43,6 @@ const busketController = {
         try {
             const { id } = req.params;
             const { quantity } = req.query;
-            console.log(req.query)
             const result = await runDBCommand(
                 `UPDATE Busket SET Quantity = ${quantity} WHERE Busket_id = ${id}`
             );

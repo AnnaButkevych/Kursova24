@@ -178,11 +178,87 @@
             .catch((error) => console.error('Помилка запиту:', error));
         }
 
-
 //todo^ call delete endpoint sql script, на фронті удалять елемент
       
-        function makeOrder(){
+        function makeOrder() {
+        // Отримуємо дані із кошика
+        const items = [];
+        const rows = document.querySelectorAll('[id^="product-item-"]');
+        
+        rows.forEach(row => {
+            const productId = row.id.split('-')[2];
+            const quantityElement = document.getElementById(`quantity-${productId}`);
+            const quantity = parseInt(quantityElement.innerText) || 0;
 
+            if (quantity > 0) {
+            items.push({
+                productId: productId,
+                quantity: quantity
+            });
+            }
+        });
+
+        // Перевіряємо, чи є товари в кошику
+        if (items.length === 0) {
+            alert('Ваш кошик порожній! Додайте товари перед оформленням замовлення.');
+            return;
+        }
+
+        // Отримуємо дані з форми замовлення
+        const customerName = document.getElementById('customerName').value.trim();
+        const customerSurname = document.getElementById('customerSurname').value.trim();
+        const customerPhone = document.getElementById('customerPhone').value.trim();
+        const paymentType = document.getElementById('paymentType').value;
+        const customerAddress = document.getElementById('customerAddress').value;
+        const customerEmail = document.getElementById('customerEmail').value;
+
+        if (!customerName || !customerSurname || !customerPhone || !paymentType || !customerAddress || !customerEmail) {
+            alert('Будь ласка, заповніть усі поля форми.');
+            return;
+        }
+            // Validate phone number
+        if (!/^\d{10}$/.test(customerPhone)) {
+            alert('Номер телефону має містити рівно 10 цифр!');
+            return;
+        }
+
+        // Validate email
+        if (!/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/.test(customerEmail)) {
+            alert('Введіть коректний email!');
+            return;
+        }
+
+        // Validate length of text fields
+        if (customerName.length > 100 || customerSurname.length > 100 || customerAddress.length > 100) {
+            alert('Довжина імені, прізвища або адреси не повинна перевищувати 100 символів!');
+            return;
+        }
+
+        // Підготовка даних для відправлення
+        const orderData = {
+            customerName: customerName,
+            customerSurname: customerSurname,
+            customerPhone: customerPhone,
+            paymentType: paymentType,
+            customerAddress: customerAddress,
+            customerEmail: customerEmail
+        };
+
+            fetch('/order/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderData),
+        });
+                // Clear the session cookie
+        document.cookie = 'connect.sid=; Max-Age=0; path=/';
+
+            fetch('/resetSession',{
+                method: 'GET'
+            });
+        alert('Замовлення успішно оформлене!');
+            window.location.href = '/';
         }
         
         // Оновлення загальної суми
@@ -204,36 +280,56 @@
       </script>
       
 
-    <div class="container my-5">
-      <h2>Форма для замовлення води</h2>
-      <form action="/create_order" method="POST" class="mt-4">
-        <div class="mb-3">
-            <label for="customerName" class="form-label">Ім'я замовника</label>
-            <input type="text" class="form-control" id="customerName" name="customerName" required>
-          </div>
-          
-          <div class="mb-3">
-            <label for="customerSurname" class="form-label">Прізвище замовника</label>
-            <input type="text" class="form-control" id="customerSurname" name="customerSurname" required>
-          </div>
-          
-          <div class="mb-3">
-            <label for="customerPhone" class="form-label">Номер телефону</label>
-            <input type="tel" class="form-control" id="customerPhone" name="customerPhone" required>
-          </div>
-          
-          <div class="mb-3">
-            <label for="paymentMethod" class="form-label">Метод оплати</label>
-            <select class="form-control" id="paymentMethod" name="paymentMethod" required>
-              <option value="готівка">Готівка</option>
-              <option value="картка">Картка</option>
-              <option value="PayPal">PayPal</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn btn-primary">Підтвердити замовлення</button>
-        </form>
+      <div class="container my-5">
+        <h2>Форма для замовлення</h2>
+        <form id="orderForm">
+            <!-- Name -->
+            <div class="mb-3">
+                <label for="customerName" class="form-label">Ім'я замовника</label>
+                <input type="text" class="form-control" id="customerName" name="customerName" maxlength="100" required>
+            </div>
+    
+            <!-- Surname -->
+            <div class="mb-3">
+                <label for="customerSurname" class="form-label">Прізвище замовника</label>
+                <input type="text" class="form-control" id="customerSurname" name="customerSurname" maxlength="100" required>
+            </div>
+    
+            <!-- Phone -->
+            <div class="mb-3">
+                <label for="customerPhone" class="form-label">Номер телефону</label>
+                <input type="tel" class="form-control" id="customerPhone" name="customerPhone" pattern="^\d{10}$" placeholder="Введіть 10 цифр, без пробілів" required>
+            </div>
+    
+            <!-- Payment Type -->
+            <div class="mb-3">
+                <label for="paymentType" class="form-label">Метод оплати</label>
+                <select class="form-control" id="paymentType" name="paymentType" required>
+                    <option value="1">Готівка</option>
+                    <option value="2">Картка</option>
+                    <option value="3">PayPal</option>
+                </select>
+            </div>
+    
+            <!-- Address -->
+            <div class="mb-3">
+                <label for="customerAddress" class="form-label">Адреса доставки</label>
+                <input type="text" class="form-control" id="customerAddress" name="customerAddress" maxlength="100" required>
+            </div>
+    
+            <!-- Email -->
+            <div class="mb-3">
+                <label for="customerEmail" class="form-label">Електронна пошта</label>
+                <input type="email" class="form-control" id="customerEmail" name="customerEmail" pattern="^[^@]+@[^@]+\.[a-zA-Z]{2,}$" placeholder="Введіть коректний email" required>
+            </div>
+ 
+          <button type="submit" class="btn btn-primary" onclick="makeOrder()">Підтвердити замовлення</button>
       </div>
     </main>
+    <footer class="bg-light py-3 mt-4">
+        <div class="container text-center">
+            <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
+        </div>
+    </footer>
 </body>
 </html>
