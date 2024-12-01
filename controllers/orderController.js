@@ -18,7 +18,7 @@ module.exports = {
           FROM Orders`;
         
             // Query to fetch basket items
-        const busketQuery = `SELECT 
+            const busketQuery = `SELECT 
             b.Busket_id AS id,
             p.Product_name AS product_name,
             pc.Price_per_unit AS product_price,
@@ -26,18 +26,15 @@ module.exports = {
             p.Image_name,
             (pc.Price_per_unit * b.Quantity) AS total_price
         FROM 
-            Busket b 
-        JOIN Product p ON b.Order_Water_id = p.Product_id
-        LEFT JOIN Price_change pc ON p.Product_id = pc.ProductsOnWarehouse_id
+            Busket b
+        LEFT JOIN Price_change pc ON b.Price_change_id = pc.Price_change_id
+        JOIN ProductsOnWarehouse pw ON pc.ProductsOnWarehouse_id = pw.ProductsOnWarehouse_id
+        JOIN Product p ON pw.Product_id = p.Product_id
         WHERE 
-            b.Session_id = '${session_id}' 
-            AND pc.Change_date = (
-            SELECT MAX(Change_date)
-            FROM Price_change
-            WHERE ProductsOnWarehouse_id = pc.ProductsOnWarehouse_id
-            );`;
-        const busketItems = await runDBCommand(busketQuery);
-            console.log(busketItems)
+            b.Session_id = '${session_id}';`;
+    
+    const busketItems = await runDBCommand(busketQuery);
+    console.log(busketItems);
             
         // SQL-запит для отримання продуктів
         const productsQuery = `
@@ -92,14 +89,10 @@ addOrder: async (req, res) => {
         const session_id = req.session.sessionId;
         const { customerName, customerSurname, customerPhone, paymentType, customerAddress, customerEmail } = req.body;
         console.log(req.body)
-        const getProductSumQuery = `SELECT distinct
+        const getProductSumQuery = `SELECT
         SUM(b.quantity * COALESCE(pc.price_per_unit)) OVER (PARTITION BY b.Session_id) AS total_sum 
     FROM Busket b
-    JOIN Product p ON b.Order_Water_id = p.Product_id
-    LEFT JOIN (
-        SELECT pc.*, ROW_NUMBER() OVER (PARTITION BY pc.ProductsOnWarehouse_id ORDER BY pc.Change_date DESC) AS rn
-        FROM Price_change pc
-    ) pc ON p.Product_id = pc.ProductsOnWarehouse_id AND pc.rn = 1
+    JOIN Price_change pc ON b.Price_change_id = pc.Price_change_id
     WHERE b.Session_id = '${session_id}'`;
         
         const total_sum = (await runDBCommand(getProductSumQuery))[0].total_sum;
@@ -147,7 +140,7 @@ addOrder: async (req, res) => {
                 const basketItemsQuery = `
                 SELECT p.Product_id, b.Quantity
                 FROM Busket b
-                JOIN Product p ON b.Order_Water_id = p.Product_id
+                JOIN Price_change pc ON b.Price_change_id = pc.Price_change_id
                 WHERE b.Session_id = '${session_id}'`;
             
             const basketItems = await runDBCommand(basketItemsQuery);

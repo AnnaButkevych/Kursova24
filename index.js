@@ -44,27 +44,26 @@ app.get('/', async (req, res) => {
     console.log("Session ID:", session_id);
 
     const productsQuery = `SELECT 
-    p.Product_id,
+    pc.Price_change_id Product_id,
     p.Product_name,
     p.Storage_unit,
     p.Details,
     p.Image_name,
     pw.Quantity,
     pc.Price_per_unit
-    FROM
+FROM
     Product p
-    JOIN
-    ProductsOnWarehouse pw ON p.Product_id = pw.Product_id
-    JOIN
-    Price_change pc ON pw.ProductsOnWarehouse_id = pc.ProductsOnWarehouse_id
-    WHERE
-        pc.Change_date = (
-            SELECT MAX(Change_date)
-            FROM Price_change pc_sub
-            WHERE pc_sub.ProductsOnWarehouse_id = pc.ProductsOnWarehouse_id
-        );`;
+JOIN ProductsOnWarehouse pw ON p.Product_id = pw.Product_id
+JOIN Price_change pc ON pw.ProductsOnWarehouse_id = pc.ProductsOnWarehouse_id
+JOIN (
+    SELECT ProductsOnWarehouse_id, MAX(Change_date) AS max_change_date
+    FROM Price_change
+    GROUP BY ProductsOnWarehouse_id
+) latest_price ON pc.ProductsOnWarehouse_id = latest_price.ProductsOnWarehouse_id
+AND pc.Change_date = latest_price.max_change_date;`;
 
-    const products = await runDBCommand(productsQuery);
+const products = await runDBCommand(productsQuery);
+
 
 
     if (!products || products.length === 0) {

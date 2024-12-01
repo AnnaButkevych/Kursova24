@@ -13,10 +13,15 @@ const busketController = {
             console.log("Session ID:", session_id);
             console.log("Product ID:", productId);
     
-            const query = `INSERT INTO Busket (Session_id, Order_Water_id, IsProcessed) 
-                           VALUES ('${session_id}', '${productId}', false)`;
-    
-            await runDBCommand(query);
+            const query = `
+            INSERT INTO Busket (Session_id, Price_change_id, IsProcessed) 
+            SELECT '${session_id}', '${productId}', false
+            WHERE NOT EXISTS (
+                SELECT 1 FROM Busket WHERE Session_id = '${session_id}' AND Price_change_id = '${productId}'
+            )
+        `;
+
+        await runDBCommand(query);
     
             res.status(201).json({ message: 'Товар додано в кошик' });
         } catch (error) {
