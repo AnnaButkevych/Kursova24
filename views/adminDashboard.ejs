@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмін Панель - Аквасвіт</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .contact {
+            font-size: 0.9rem;
+        }
+        .contact a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        .admin-dashboard {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+        .dashboard-section {
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .action-buttons button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        .edit-btn {
+            color: #4CAF50;
+        }
+        .delete-btn {
+            color: #F44336;
+        }
+        .date-range-selector {
+            margin-top: 10px;
+        }
+        .date-range-selector input, .analyze-btn {
+            margin-right: 10px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="page-title" class="header-container">
+            <h1 class="brand">Аквасвіт</h1>
+            <div class="contact">
+                <a href="tel:0445001212">(044) 500-12-12</a>
+                <span>Графік роботи: Пн-Пт 9:00-18:00</span>
+            </div>
+        </div>
+    </header>
+    <nav class="menu">
+        <a href="/tables/orders">Замовлення</a>
+        <a href="/tables/customers">Клієнти</a>
+        <a href="/tables/deliveries">Доставки</a>
+        <a href="/statistics">Статистика</a>
+        <a href="/analysis">Аналіз</a>
+    </nav>
+    <main class="admin-dashboard">
+        <div class="filter-section">
+            <label for="filter-status">Сортувати за:</label>
+            <select id="filter-status" class="filter-select">
+                <option value="date-asc" <%= filterBy === 'date-asc' ? 'selected' : '' %>>Дата (від першої до останньої)</option>
+                <option value="date-desc" <%= filterBy === 'date-desc' ? 'selected' : '' %>>Дата (від останньої до першої)</option>
+                <option value="sum-asc" <%= filterBy === 'sum-asc' ? 'selected' : '' %>>Сума (від найменшої до найбільшої)</option>
+                <option value="sum-desc" <%= filterBy === 'sum-desc' ? 'selected' : '' %>>Сума (від найбільшої до найменшої)</option>
+            </select>
+        
+            <input type="text" id="search-orders" placeholder="Пошук замовлень" value="<%= searchQuery %>" />
+            
+            <button id="filter-btn">Застосувати</button>
+        </div>
+        
+
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Замовлення</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                        <th>Сума</th>
+                        <th>Клієнт</th>
+                        <th>Тип оплати</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (orders.length > 0) { %>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td><%= order.Orders_id %></td>
+                                <td><%= new Date(order.Date).toLocaleDateString('uk-UA') %></td>
+                                <td><%= order.Status %></td>
+                                <td><%= order.Sum %></td>
+                                <td><%= order.CustomerName %> <%= order.CustomerSurname %></td>
+                                <td><%= order.PaymentType %></td>
+                                <td class="action-icons">
+                                    <i class="fas fa-edit edit-btn" title="Редагувати"></i>
+                                    <i class="fas fa-trash-alt delete-btn" title="Видалити"></i>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="7">Немає даних про замовлення</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </section>
+
+
+        <!-- Інші секції -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Аналіз</h2>
+            </div>
+            <div class="date-range-selector">
+                <label for="start-date">Від:</label>
+                <input type="date" id="start-date" name="start-date">
+                <label for="end-date">До:</label>
+                <input type="date" id="end-date" name="end-date">
+                <button class="analyze-btn">Аналізувати</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+
+        document.getElementById('filter-btn').addEventListener('click', function() {
+        const filterBy = document.getElementById('filter-status').value;
+        const searchQuery = document.getElementById('search-orders').value;
+        
+        // Формуємо URL з параметрами запиту
+        const url = new URL(window.location.href);
+        url.searchParams.set('filterBy', filterBy);
+        url.searchParams.set('searchQuery', searchQuery);
+        
+        // Перенаправляємо на нову URL-адресу для отримання відфільтрованих даних
+        window.location.href = url;
+    });
+        document.addEventListener('DOMContentLoaded', () => {
+            const analyzeBtn = document.querySelector('.analyze-btn');
+            const startDateInput = document.getElementById('start-date');
+            const endDateInput = document.getElementById('end-date');
+
+            analyzeBtn.addEventListener('click', () => {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+
+                if (!startDate || !endDate) {
+                    alert('Оберіть обидві дати.');
+                    return;
+                }
+
+                if (new Date(startDate) > new Date(endDate)) {
+                    alert('Дата "Від" не може бути пізнішою за "До".');
+                    return;
+                }
+
+                console.log(`Аналіз від ${startDate} до ${endDate}`);
+            });
+        });
+    </script>
+</body>
+</html>

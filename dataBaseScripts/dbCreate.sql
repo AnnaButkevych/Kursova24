@@ -46,20 +46,8 @@ CREATE TABLE Orders (
 CREATE TABLE Busket (
     Busket_id INT PRIMARY KEY AUTO_INCREMENT,
     Session_id VARCHAR(100),
-    Order_Water_id INT,
     IsProcessed BOOLEAN,
-    FOREIGN KEY (Order_Water_id) REFERENCES Order_Water(Order_Water_id)
-);
-
-CREATE TABLE Order_Water (
-    Order_Water_id INT PRIMARY KEY AUTO_INCREMENT,
-    Orders_id INT,
-    Price_change_id INT,
-    Amount INT NOT NULL,
-    FOREIGN KEY (Orders_id) REFERENCES Orders(Orders_id),
-    FOREIGN KEY (Price_change_id) REFERENCES Price_change(Price_change_id)
-);
-
+    FOREIGN KEY (Payment_type_id) REFERENCES Payment_type(Payment_type_id),);
 
 CREATE TABLE Warehouse (
     Warehouse_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -114,4 +102,10 @@ CREATE TABLE WaterProbe (
     Parameters_id INT,
     FOREIGN KEY (WaterStation_id) REFERENCES WaterStation(WaterStation_id),
     FOREIGN KEY (Parameters_id) REFERENCES Parameters(Parameters_id)
+);
+
+CREATE TABLE AdminUser (
+    AdminUser_id INT AUTO_INCREMENT PRIMARY KEY,
+    UserName VARCHAR(255) NOT NULL,
+    Password VARCHAR(255) NOT NULL
 );

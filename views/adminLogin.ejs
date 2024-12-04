@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <div id="page-title" class="header-container">
+          <h1 class="brand">Аквасвіт</h1>
+          <div class="contact">
+            <a href="tel:0445001212">(044) 500-12-12</a>
+            <span>Графік роботи: Пн-Пт 9:00-18:00</span>
+      </header>
+    <h1>Вхід для адміністратора</h1>
+    <form id="loginForm">
+        <label for="username">Ім'я адміністратора:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Увійти</button>
+    </form>
+<style>
+    /* Глобальні налаштування */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+  background-color: #007BFF;
+  color: white;
+  padding: 20px 10%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .header-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+header h1 {
+  margin: 0;
+}
+
+.brand {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+}
+
+.contact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-left: auto;
+}
+
+.contact a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.contact a:hover {
+    color: #2980b9;
+}
+
+.contact span {
+    font-size: 14px;
+    color: #bdc3c7;
+}
+
+/* Сторінка входу */
+h1 {
+    text-align: center;
+    margin: 40px 0 30px;
+    color: #2c3e50;
+}
+
+#loginForm {
+    width: 380px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#loginForm label {
+    display: block;
+    margin-bottom: 8px;
+    color: #34495e;
+    font-weight: 600;
+}
+
+#loginForm input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 2px solid #bdc3c7;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+}
+
+#loginForm input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+#loginForm button {
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+}
+
+#loginForm button:hover {
+    background-color: #2980b9;
+}
+
+/* Адаптивність */
+@media screen and (max-width: 600px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .contact {
+        margin-left: 0;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    #loginForm {
+        width: 90%;
+        padding: 20px;
+    }
+}
+</style>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Зупиняємо стандартну відправку форми
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Відправка даних на сервер через Fetch API
+            fetch('/admin/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Successful login')
+                window.location.href = '/admin/dashboard';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Сталася помилка при вході');
+            });
+        });
+    </script>
+</body>
+</html>

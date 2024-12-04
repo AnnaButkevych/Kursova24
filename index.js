@@ -92,6 +92,13 @@ app.use('/busket', busketRoutes);
 const productRoutes = require("./routes/product");
 app.use("/products", productRoutes);
 
+const adminRoutes = require('./routes/admin');
+app.use('/admin', adminRoutes);
+
+const adminDashboardRoutes = require('./routes/adminDashboard');
+app.use('/admin', adminDashboardRoutes);
+
+
 app.use('/', router);
 
 // Запуск сервера
