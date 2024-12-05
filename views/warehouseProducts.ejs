@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Склади та продукти - Адмін Панель</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<style>
+    body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f9f9f9;
+            }
+            header {
+                background-color: #007bff;
+                color: #fff;
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .brand {
+                font-size: 1.5rem;
+                font-weight: bold;
+            }
+            .contact {
+                font-size: 0.9rem;
+            }
+            .contact a {
+                color: #fff;
+                text-decoration: none;
+                margin-right: 15px;
+            }
+            .menu {
+                background-color: #f4f4f4;
+                padding: 10px 20px;
+                display: flex;
+                gap: 20px;
+            }
+            .menu a {
+                text-decoration: none;
+                color: #007bff;
+                font-weight: bold;
+            }
+            .menu a:hover {
+                text-decoration: underline;
+            }
+            .admin-dashboard {
+                padding: 20px;
+            }
+            .dashboard-section {
+                background-color: #f4f4f4;
+                border-radius: 8px;
+                padding: 15px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                width: 100%;
+            }
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 15px;
+            }
+            table, th, td {
+                border: 1px solid #ccc;
+            }
+            th, td {
+                padding: 10px;
+                text-align: left;
+            }
+            th {
+                background-color: #f0f0f0;
+            }
+            .edit-btn {
+                color: #4CAF50;
+            }
+            .delete-btn {
+                color: #F44336;
+            }
+        </style>
+<body>
+    <header>
+        <div id="page-title" class="header-container">
+            <h1 class="brand">Аквасвіт</h1>
+            <div class="contact">
+                <a href="tel:0445001212">(044) 500-12-12</a>
+                <span>Графік роботи: Пн-Пт 9:00-18:00</span>
+            </div>
+        </div>
+    </header>
+    <nav class="menu">
+        <a href="/admin/dashboard">Замовлення</a>
+        <a href="/tables/customers">Замовники</a>
+        <a href="/tables/deliveries">Доставки</a>
+        <a href="/tables/couriers">Кур'єри</a>
+        <a href="/statistics">Статистика</a>
+        <a href="/analysis">Аналіз</a>
+        <a href="/tables/warehouse-products">Склади та продукти</a>
+        <a href="/tables/water-stations">Станції та проби води</a>
+    </nav>
+
+    <main class="admin-dashboard">
+        <section class="dashboard-section">
+            <h2>Склади та продукти</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Складу</th>
+                        <th>Тип складу</th>
+                        <th>Адреса</th>
+                        <th>ID Продукту</th>
+                        <th>Назва продукту</th>
+                        <th>Одиниця зберігання</th>
+                        <th>Кількість</th>
+                        <th>Ціна</th>
+                        <th>Дата зміни ціни</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% results.forEach(row => { %>
+                        <tr>
+                            <td><%= row.Warehouse_id %></td>
+                            <td><%= row.WarehouseType %></td>
+                            <td><%= row.WarehouseAddress %></td>
+                            <td><%= row.Product_id || 'Немає' %></td>
+                            <td><%= row.Product_name || 'Немає' %></td>
+                            <td><%= row.Storage_unit || 'Немає' %></td>
+                            <td><%= row.Quantity || 0 %></td>
+                            <td><%= row.Price_per_unit || 'Немає' %></td>
+                            <td><%= new Date(row.Change_date).toLocaleDateString('uk-UA') || 'Немає' %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>

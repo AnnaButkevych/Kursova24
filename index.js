@@ -98,6 +98,26 @@ app.use('/admin', adminRoutes);
 const adminDashboardRoutes = require('./routes/adminDashboard');
 app.use('/admin', adminDashboardRoutes);
 
+const couriersRouter = require('./routes/couriers');
+app.use('/tables/couriers', couriersRouter);
+
+
+const customersRouter = require('./routes/customers');
+const deliveriesRouter = require('./routes/deliveries');
+const statisticsRouter = require('./routes/statistics');
+const analysisRouter = require('./routes/analysis');
+
+app.use('/tables/customers', customersRouter);
+app.use('/tables/deliveries', deliveriesRouter);
+app.use('/statistics', statisticsRouter);
+app.use('/analysis', analysisRouter);
+
+const warehouseProductsRouter = require('./routes/warehouseProducts');
+const waterStationsRouter = require('./routes/waterStations');
+
+app.use('/tables/warehouse-products', warehouseProductsRouter);
+app.use('/tables/water-stations', waterStationsRouter);
+
 
 app.use('/', router);
 

@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Адмін Панель - Аквасвіт</title>
+    <title>Доставки - Адмін Панель</title>
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-body {
+        body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -78,6 +78,12 @@ body {
         th {
             background-color: #f0f0f0;
         }
+        .action-buttons button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
         .edit-btn {
             color: #4CAF50;
         }
@@ -97,6 +103,7 @@ body {
         </div>
     </header>
     <nav class="menu">
+        <a href="/admin/dashboard">Замовлення</a>
         <a href="/tables/customers">Замовники</a>
         <a href="/tables/deliveries">Доставки</a>
         <a href="/tables/couriers">Кур'єри</a>
@@ -105,79 +112,46 @@ body {
         <a href="/tables/warehouse-products">Склади та продукти</a>
         <a href="/tables/water-stations">Станції та проби води</a>
     </nav>
-    <main class="admin-dashboard">
-        <div class="filter-section">
-            <label for="filter-status">Сортувати за:</label>
-            <select id="filter-status" class="filter-select">
-                <option value="date-asc" <%= filterBy === 'date-asc' ? 'selected' : '' %>>Дата (від першої до останньої)</option>
-                <option value="date-desc" <%= filterBy === 'date-desc' ? 'selected' : '' %>>Дата (від останньої до першої)</option>
-                <option value="sum-asc" <%= filterBy === 'sum-asc' ? 'selected' : '' %>>Сума (від найменшої до найбільшої)</option>
-                <option value="sum-desc" <%= filterBy === 'sum-desc' ? 'selected' : '' %>>Сума (від найбільшої до найменшої)</option>
-            </select>
-        
-            <input type="text" id="search-orders" placeholder="Пошук замовлень" value="<%= searchQuery %>" />
-            
-            <button id="filter-btn">Застосувати</button>
-        </div>
-        
 
+    <main class="admin-dashboard">
         <section class="dashboard-section">
             <div class="section-header">
-                <h2>Замовлення</h2>
+                <h2>Список доставок</h2>
+                <div class="action-buttons">
+                    <button class="edit-btn" title="Додати нову доставку">
+                        <i class="fas fa-truck"></i> Додати доставку
+                    </button>
+                </div>
             </div>
+
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Дата</th>
-                        <th>Статус</th>
-                        <th>Сума</th>
-                        <th>Клієнт</th>
-                        <th>Тип оплати</th>
+                        <th>Адреса доставки</th>
+                        <th>Кур'єр</th>
                         <th>Дії</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% if (orders.length > 0) { %>
-                        <% orders.forEach(order => { %>
-                            <tr>
-                                <td><%= order.Orders_id %></td>
-                                <td><%= new Date(order.Date).toLocaleDateString('uk-UA') %></td>
-                                <td><%= order.Status %></td>
-                                <td><%= order.Sum %></td>
-                                <td><%= order.CustomerName %> <%= order.CustomerSurname %></td>
-                                <td><%= order.PaymentType %></td>
-                                <td class="action-icons">
-                                    <i class="fas fa-edit edit-btn" title="Редагувати"></i>
-                                    <i class="fas fa-trash-alt delete-btn" title="Видалити"></i>
-                                </td>
-                            </tr>
-                        <% }); %>
-                    <% } else { %>
+                    <% deliveries.forEach(delivery => { %>
                         <tr>
-                            <td colspan="7">Немає даних про замовлення</td>
+                            <td><%= delivery.Delivery_id %></td>
+                            <td><%= delivery.Delivery_address %></td>
+                            <td><%= delivery.Courier_id %></td>
+                            <td class="action-buttons">
+                                <button class="edit-btn" title="Редагувати доставку">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-btn" title="Видалити доставку">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
                         </tr>
-                    <% } %>
+                    <% }); %>
                 </tbody>
             </table>
         </section>
-
     </main>
-
-    <script>
-
-        document.getElementById('filter-btn').addEventListener('click', function() {
-        const filterBy = document.getElementById('filter-status').value;
-        const searchQuery = document.getElementById('search-orders').value;
-        
-        // Формуємо URL з параметрами запиту
-        const url = new URL(window.location.href);
-        url.searchParams.set('filterBy', filterBy);
-        url.searchParams.set('searchQuery', searchQuery);
-        
-        // Перенаправляємо на нову URL-адресу для отримання відфільтрованих даних
-        window.location.href = url;
-    });
-    </script>
 </body>
 </html>

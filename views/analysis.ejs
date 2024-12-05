@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аналіз - Адмін Панель</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .contact {
+            font-size: 0.9rem;
+        }
+        .contact a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        .menu {
+            background-color: #f4f4f4;
+            padding: 10px 20px;
+            display: flex;
+            gap: 20px;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .menu a:hover {
+            text-decoration: underline;
+        }
+        .admin-dashboard {
+            padding: 20px;
+        }
+        .dashboard-section {
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .date-range-selector {
+            margin-top: 10px;
+        }
+        .date-range-selector input,
+        .analyze-btn {
+            margin-right: 10px;
+            padding: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .error-message {
+            color: red;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="page-title" class="header-container">
+            <h1 class="brand">Аквасвіт</h1>
+            <div class="contact">
+                <a href="tel:0445001212">(044) 500-12-12</a>
+                <span>Графік роботи: Пн-Пт 9:00-18:00</span>
+            </div>
+        </div>
+    </header>
+    <nav class="menu">
+        <a href="/admin/dashboard">Замовлення</a>
+        <a href="/tables/customers">Замовники</a>
+        <a href="/tables/deliveries">Доставки</a>
+        <a href="/tables/couriers">Кур'єри</a>
+        <a href="/statistics">Статистика</a>
+        <a href="/analysis">Аналіз</a>
+        <a href="/tables/warehouse-products">Склади та продукти</a>
+        <a href="/tables/water-stations">Станції та проби води</a>
+    </nav>
+
+    <main class="admin-dashboard">
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Аналіз за період</h2>
+            </div>
+
+            <!-- Форма для введення діапазону дат -->
+            <form action="/analysis" method="get" id="analysisForm">
+                <div class="date-range-selector">
+                    <label for="start-date">Від:</label>
+                    <input type="date" id="start-date" name="startDate" required>
+                    <label for="end-date">До:</label>
+                    <input type="date" id="end-date" name="endDate" required>
+                    <button type="submit" class="analyze-btn">Зробити аналіз</button>
+                </div>
+                <div class="error-message" id="error-message"></div> <!-- Повідомлення про помилку -->
+            </form>
+
+            <% if (analysis) { %>
+                <h3>Результати аналізу з <%= startDate %> по <%= endDate %></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Кількість замовлень</th>
+                            <th>Загальна сума</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><%= analysis[0].OrderCount %></td>
+                            <td><%= analysis[0].TotalAmount %></td>
+                        </tr>
+                    </tbody>
+                </table>
+            <% } else { %>
+                <p>Будь ласка, виберіть діапазон дат для аналізу.</p>
+            <% } %>
+        </section>
+    </main>
+
+    <script>
+        // Валідація форми
+        const form = document.getElementById('analysisForm');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        const errorMessage = document.getElementById('error-message');
+
+        form.addEventListener('submit', function (event) {
+            // Перевірка на вибір дат
+            if (!startDateInput.value || !endDateInput.value) {
+                errorMessage.textContent = 'Будь ласка, оберіть діапазон дат.';
+                event.preventDefault(); // Запобігає відправці форми
+            } else if (new Date(startDateInput.value) > new Date(endDateInput.value)) {
+                errorMessage.textContent = 'Дата "Від" не може бути пізнішою за "До".';
+                event.preventDefault(); // Запобігає відправці форми
+            } else {
+                errorMessage.textContent = ''; // Очищаємо повідомлення про помилку
+            }
+        });
+    </script>
+</body>
+</html>
