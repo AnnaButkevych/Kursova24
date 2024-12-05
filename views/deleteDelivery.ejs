@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Видалення доставки - Адмін Панель</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Видалення доставки</h1>
+    </header>
+
+    <form action="/delivery/delete" method="POST" style="display:inline-block;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю доставку?');">
+        <input type="hidden" name="Delivery_id" value="<%= delivery.Delivery_id %>">
+        <button class="delete-btn" title="Видалити доставку">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </form>
+    <footer class="bg-light py-3 mt-4">
+        <div class="container text-center">
+            <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
+        </div>
+      </footer>
+</body>
+</html>

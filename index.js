@@ -118,6 +118,10 @@ const waterStationsRouter = require('./routes/waterStations');
 app.use('/tables/warehouse-products', warehouseProductsRouter);
 app.use('/tables/water-stations', waterStationsRouter);
 
+const deliveryActionsRouter = require('./routes/deliveryActions');
+
+app.use('/delivery', deliveryActionsRouter);
+
 
 app.use('/', router);
 

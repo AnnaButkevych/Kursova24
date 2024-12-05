@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кур'єри - Адмін Панель</title>
+    <title>Редагування доставки - Адмін Панель</title>
     <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
+</head>
+<style>
+    body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -78,20 +78,73 @@
         th {
             background-color: #f0f0f0;
         }
-        .action-buttons button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-        .edit-btn {
-            color: #4CAF50;
-        }
-        .delete-btn {
-            color: #F44336;
-        }
-    </style>
-</head>
+
+/* Стиль для форми */
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: 30px auto;
+}
+
+label {
+    display: block;
+    font-size: 1rem;
+    margin: 10px 0 5px;
+}
+
+input[type="text"],
+select {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+button[type="button"] {
+    background-color: #f44336;
+    color: white;
+    margin-left: 10px;
+}
+
+button[type="button"]:hover {
+    background-color: #d32f2f;
+}
+
+/* Кроки для кращої видимості */
+input[type="text"]:focus,
+select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+form .form-group {
+    margin-bottom: 20px;
+}
+
+</style>
 <body>
     <header>
         <div id="page-title" class="header-container">
@@ -113,54 +166,27 @@
         <a href="/tables/water-stations">Станції та проби води</a>
     </nav>
 
-    <main class="admin-dashboard">
-        <section class="dashboard-section">
-            <div class="section-header">
-                <h2>Список кур'єрів</h2>
-                <div class="action-buttons">
-                    <button class="edit-btn" title="Додати нового кур'єра">
-                        <i class="fas fa-user-plus"></i> Додати кур'єра
-                    </button>
-                </div>
-            </div>
+    <form action="/delivery/edit" method="POST">
+        <input type="hidden" name="Delivery_id" value="<%= delivery.Delivery_id %>">
+        <label for="Delivery_address">Адреса:</label>
+        <input type="text" name="Delivery_address" value="<%= delivery.Delivery_address %>" required>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Ім'я</th>
-                        <th>Прізвище</th>
-                        <th>Телефон</th>
-                        <th>Статус</th>
-                        <th>Дії</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% couriers.forEach(courier => { %>
-                        <tr>
-                            <td><%= courier.Courier_id %></td>
-                            <td><%= courier.Name %></td>
-                            <td><%= courier.Surname %></td>
-                            <td><%= courier.Phone_number %></td>
-                            <td><%= courier.Courier_status %></td>
-                            <td class="action-buttons">
-                                <button class="edit-btn" title="Редагувати кур'єра">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="delete-btn" title="Видалити кур'єра">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    <% }); %>
-                </tbody>
-            </table>
-        </section>
-    </main>
-    <footer class="bg-light py-3 mt-4">
-        <div class="container text-center">
-            <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
-        </div>
-      </footer>
+        <label for="Courier_id">Кур'єр:</label>
+        <select name="Courier_id" required>
+            <% couriers.forEach(courier => { %>
+                <option value="<%= courier.Courier_id %>" <%= courier.Courier_id === delivery.Courier_id ? 'selected' : '' %> >
+                    <%= courier.Courier_id %> - <%= courier.Name %> <%= courier.Surname %> (Статус: <%= courier.Courier_status %>)
+                </option>
+            <% }); %>
+        </select>
+
+        <button type="submit">Зберегти зміни</button>
+        <button type="button" onclick="window.history.back()">Назад</button>
+    </form>
 </body>
+<footer class="bg-light py-3 mt-4">
+    <div class="container text-center">
+        <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
+    </div>
+  </footer>
 </html>

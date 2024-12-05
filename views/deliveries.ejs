@@ -118,9 +118,11 @@
             <div class="section-header">
                 <h2>Список доставок</h2>
                 <div class="action-buttons">
-                    <button class="edit-btn" title="Додати нову доставку">
-                        <i class="fas fa-truck"></i> Додати доставку
-                    </button>
+                    <a href="/delivery/add">
+                        <button class="edit-btn" title="Додати нову доставку">
+                            <i class="fas fa-truck"></i> Додати доставку
+                        </button>
+                    </a>                    
                 </div>
             </div>
 
@@ -140,12 +142,20 @@
                             <td><%= delivery.Delivery_address %></td>
                             <td><%= delivery.Courier_id %></td>
                             <td class="action-buttons">
-                                <button class="edit-btn" title="Редагувати доставку">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="delete-btn" title="Видалити доставку">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
+                                <!-- Редагування -->
+                                <a href="/delivery/edit/<%= delivery.Delivery_id %>">
+                                    <button class="edit-btn" title="Редагувати доставку">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </a>
+                
+                                <!-- Видалення -->
+                                <form action="/delivery/delete" method="POST" style="display:inline-block;" onsubmit="return confirm('Ви впевнені, що хочете видалити цю доставку?');">
+                                    <input type="hidden" name="Delivery_id" value="<%= delivery.Delivery_id %>">
+                                    <button class="delete-btn" title="Видалити доставку">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <% }); %>
@@ -153,5 +163,10 @@
             </table>
         </section>
     </main>
+    <footer class="bg-light py-3 mt-4">
+        <div class="container text-center">
+            <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
+        </div>
+      </footer>
 </body>
 </html>
