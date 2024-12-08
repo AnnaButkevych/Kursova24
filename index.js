@@ -3,9 +3,10 @@ const path = require('path');
 const router = express.Router();
 const session = require('express-session');
 const { runDBCommand } = require('./db/connection'); // Шлях до connection.js
-
+const bodyParser = require('body-parser');
 const app = express();
 const PORT = 3000;
+app.use(bodyParser.urlencoded({limit: '5000mb', extended: true, parameterLimit: 100000000000}));
 
 app.use(session({
   secret: 'your-secret-key',  // Secret key for session encryption
@@ -22,8 +23,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Встановлення EJS як шаблонізатора
 app.set('views', path.join(__dirname, 'views')); // Шлях до views
@@ -101,6 +102,8 @@ app.use('/admin', adminDashboardRoutes);
 const couriersRouter = require('./routes/couriers');
 app.use('/tables/couriers', couriersRouter);
 
+const courierActionsRoutes = require('./routes/courierActions');
+app.use('/courierActions', courierActionsRoutes);
 
 const customersRouter = require('./routes/customers');
 const deliveriesRouter = require('./routes/deliveries');
@@ -122,6 +125,10 @@ const deliveryActionsRouter = require('./routes/deliveryActions');
 
 app.use('/delivery', deliveryActionsRouter);
 
+const warehouseProductsActionRoutes = require('./routes/warehouseProductsAction');
+const warehouseProductsRoutes = require('./routes/warehouseProducts');
+app.use('/tables/warehouse-products', warehouseProductsRoutes);
+app.use('/warehouseProduct', warehouseProductsActionRoutes);
 
 app.use('/', router);
 

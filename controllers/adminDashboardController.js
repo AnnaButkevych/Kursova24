@@ -2,8 +2,8 @@ const { runDBCommand } = require('../db/connection');
 
 module.exports = {
     async getDashboardData(req, res) {
-        const { filterBy, searchQuery } = req.query; // Отримуємо параметри сортування та пошуку
-        
+        const { filterBy, searchQuery, orderStatus } = req.query; // Отримуємо параметри сортування та пошуку
+
         // Базовий SQL-запит
         let query = `
             SELECT 
@@ -18,10 +18,14 @@ module.exports = {
             JOIN Customer c ON o.Customer_id = c.Customer_id
             JOIN Payment_type pt ON o.Payment_type_id = pt.Payment_type_id
         `;
-        
-        // Додавання пошуку
+
+        // Додавання пошуку по замовленням (статус, ім'я або прізвище клієнта)
         if (searchQuery) {
             query += ` WHERE o.Status LIKE '%${searchQuery}%' OR c.Name LIKE '%${searchQuery}%' OR c.Surname LIKE '%${searchQuery}%'`;
+        }
+
+        if (filterBy) {
+            query += ` AND o.Status = '${filterBy}'`;  // Фільтрація за статусом
         }
 
         // Додавання сортування
@@ -43,8 +47,9 @@ module.exports = {
             res.status(200).render('adminDashboard', {
                 success: true,
                 orders: ordersDetails,
-                filterBy: filterBy || 'date-desc', // Якщо немає filterBy, за замовчуванням 'date-desc'
-                searchQuery: searchQuery || '' // Якщо немає searchQuery, використовуємо порожній рядок
+                filterBy: filterBy || '', // Якщо немає filterBy, за замовчуванням 'date-desc'
+                searchQuery: searchQuery || '', // Якщо немає searchQuery, використовуємо порожній рядок
+                orderStatus: orderStatus || '' // Якщо немає orderStatus, за замовчуванням порожній рядок
             });
         } catch (error) {
             console.error('Error in getDashboardData:', error);

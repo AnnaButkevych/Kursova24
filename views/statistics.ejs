@@ -106,7 +106,7 @@
             <div class="section-header">
                 <h2>Статистика</h2>
             </div>
-
+    
             <!-- Статистика кількості замовлень по місяцях -->
             <h3>Кількість замовлень по місяцях</h3>
             <table>
@@ -118,10 +118,48 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% statistics.forEach(stat => { %>
+                    <% ordersPerMonth.forEach(stat => { %>
                         <tr>
                             <td><%= stat.Year %></td>
                             <td><%= stat.Month %></td>
+                            <td><%= stat.OrderCount %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+    
+            <!-- Статистика кількості замовлень за кур'єрами -->
+            <h3>Кількість замовлень за кур'єрами</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Кур'єр</th>
+                        <th>Кількість замовлень</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% ordersByCourier.forEach(stat => { %>
+                        <tr>
+                            <td><%= stat.CourierName %> <%= stat.CourierSurname %></td>
+                            <td><%= stat.OrderCount %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+    
+            <!-- Статистика популярності способів оплати -->
+            <h3>Популярність способів оплати</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Спосіб оплати</th>
+                        <th>Кількість замовлень</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% paymentMethodPopularity.forEach(stat => { %>
+                        <tr>
+                            <td><%= stat.PaymentType %></td>
                             <td><%= stat.OrderCount %></td>
                         </tr>
                     <% }); %>

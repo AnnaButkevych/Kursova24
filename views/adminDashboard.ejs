@@ -63,6 +63,43 @@
             align-items: center;
             margin-bottom: 15px;
         }
+        .filter-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .filter-section label {
+        font-weight: bold;
+    }
+
+    .filter-select, #search-orders {
+        padding: 10px;
+        font-size: 1rem;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        margin-right: 10px;
+        width: 250px;
+    }
+
+    #search-orders {
+        width: 300px;
+    }
+
+    #filter-btn {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    #filter-btn:hover {
+        background-color: #0056b3;
+    }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -84,6 +121,54 @@
         .delete-btn {
             color: #F44336;
         }
+        .action-icons i {
+        cursor: pointer;
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    .edit-btn {
+        color: #4CAF50;
+    }
+
+    .delete-btn {
+        color: #F44336;
+    }
+
+    .edit-btn:hover, .delete-btn:hover {
+        opacity: 0.7;
+    }
+
+    .add-btn {
+        background: none;
+        border: none;
+        color: #007bff;
+        cursor: pointer;
+        font-size: 1.2rem;
+        text-decoration: none;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .filter-section {
+        display: flex;
+        gap: 15px;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .filter-section select {
+        padding: 10px;
+        font-size: 1rem;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        width: 200px;
+    }
     </style>
 </head>
 <body>
@@ -115,7 +200,14 @@
                 <option value="sum-asc" <%= filterBy === 'sum-asc' ? 'selected' : '' %>>Сума (від найменшої до найбільшої)</option>
                 <option value="sum-desc" <%= filterBy === 'sum-desc' ? 'selected' : '' %>>Сума (від найбільшої до найменшої)</option>
             </select>
-        
+
+            <label for="filter-status">Фільтрувати за статусом:</label>
+            <select id="filter-status" class="filter-select">
+                <option value="">Виберіть статус</option>
+                <option value="Виконано" <%= filterBy === 'Виконано' ? 'selected' : '' %>>Виконано</option>
+                <option value="Очікує" <%= filterBy === 'Очікує' ? 'selected' : '' %>>Очікує</option>
+                <option value="скасоване" <%= filterBy === 'скасоване' ? 'selected' : '' %>>скасоване</option>
+            </select>
             <input type="text" id="search-orders" placeholder="Пошук замовлень" value="<%= searchQuery %>" />
             
             <button id="filter-btn">Застосувати</button>
@@ -166,19 +258,18 @@
     </main>
 
     <script>
-
         document.getElementById('filter-btn').addEventListener('click', function() {
-        const filterBy = document.getElementById('filter-status').value;
-        const searchQuery = document.getElementById('search-orders').value;
-        
-        // Формуємо URL з параметрами запиту
-        const url = new URL(window.location.href);
-        url.searchParams.set('filterBy', filterBy);
-        url.searchParams.set('searchQuery', searchQuery);
-        
-        // Перенаправляємо на нову URL-адресу для отримання відфільтрованих даних
-        window.location.href = url;
-    });
+            const filterBy = document.getElementById('filter-status').value;
+            const orderStatus = document.getElementById('order-status').value;
+            const searchQuery = document.getElementById('search-orders').value;
+            
+            const url = new URL(window.location.href);
+            url.searchParams.set('filterBy', filterBy);
+            url.searchParams.set('searchQuery', searchQuery);
+            url.searchParams.set('orderStatus', orderStatus);
+            
+            window.location.href = url;
+        });
     </script>
     <footer class="bg-light py-3 mt-4">
         <div class="container text-center">

@@ -78,17 +78,25 @@
         th {
             background-color: #f0f0f0;
         }
-        .action-buttons button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
+        .action-buttons a {
+            text-decoration: none;
+            margin-right: 10px;
         }
         .edit-btn {
             color: #4CAF50;
+            font-size: 1.2rem;
         }
         .delete-btn {
             color: #F44336;
+            font-size: 1.2rem;
+        }
+        .add-btn {
+            background: none;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 1.2rem;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -118,9 +126,9 @@
             <div class="section-header">
                 <h2>Список кур'єрів</h2>
                 <div class="action-buttons">
-                    <button class="edit-btn" title="Додати нового кур'єра">
+                    <a href="/courierActions/add" class="add-btn">
                         <i class="fas fa-user-plus"></i> Додати кур'єра
-                    </button>
+                    </a>
                 </div>
             </div>
 
@@ -137,17 +145,20 @@
                 </thead>
                 <tbody>
                     <% couriers.forEach(courier => { %>
-                        <tr>
+                        <tr data-courier-id="<%= courier.Courier_id %>" data-courier-name="<%= courier.Name %>" data-courier-surname="<%= courier.Surname %>">
                             <td><%= courier.Courier_id %></td>
                             <td><%= courier.Name %></td>
                             <td><%= courier.Surname %></td>
                             <td><%= courier.Phone_number %></td>
                             <td><%= courier.Courier_status %></td>
                             <td class="action-buttons">
-                                <button class="edit-btn" title="Редагувати кур'єра">
+                                <a href="/courierActions/edit/<%= courier.Courier_id %>" class="edit-btn" title="Редагувати кур'єра">
                                     <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="delete-btn" title="Видалити кур'єра">
+                                </a>
+                                <button class="delete-btn" data-courier-id="<%= courier.Courier_id %>" 
+                                        data-courier-name="<%= courier.Name %>" 
+                                        data-courier-surname="<%= courier.Surname %>" 
+                                        title="Видалити кур'єра">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </td>
@@ -162,5 +173,51 @@
             <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
         </div>
       </footer>
+      <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            // Get the data attributes from the clicked button
+            const courierId = this.dataset.courierId;
+            const courierName = this.dataset.courierName;
+            const courierSurname = this.dataset.courierSurname;
+
+            // Check if the data attributes exist and are not undefined
+            if (!courierName || !courierSurname) {
+                console.error('Courier name or surname is missing.');
+                return;
+            }
+
+            // Ask for confirmation before deleting
+            if (confirm(`Ви впевнені, що хочете видалити кур'єра: ${courierName} ${courierSurname}?`)) {
+                // Send DELETE request via AJAX
+                fetch(`/courierActions/delete/${courierId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Кур\'єр успішно видалений!');
+                        // Remove the row from the table without refreshing the page
+                        document.querySelector(`[data-courier-id="${courierId}"]`).remove();
+                    } else {
+                        alert('Помилка при видаленні кур\'єра.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Щось пішло не так.');
+                });
+            }
+        });
+    });
+});
+
+    </script>
 </body>
 </html>

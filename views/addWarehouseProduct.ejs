@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Додавання продукту до складу - Адмін Панель</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.contact {
+    font-size: 0.9rem;
+}
+
+.contact a {
+    color: #fff;
+    text-decoration: none;
+    margin-right: 15px;
+}
+
+.menu {
+    background-color: #f4f4f4;
+    padding: 10px 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.menu a:hover {
+    text-decoration: underline;
+}
+
+.admin-dashboard {
+    padding: 20px;
+}
+
+.dashboard-section {
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+input[type="number"], input[type="date"], button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+input[type="number"]:focus, input[type="date"]:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+button[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+button[type="button"] {
+    background-color: #f44336;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button[type="button"]:hover {
+    background-color: #d32f2f;
+}
+
+
+</style>
+</head>
+<body> 
+<header>
+    <div id="page-title" class="header-container">
+        <h1 class="brand">Аквасвіт</h1>
+        <div class="contact">
+            <a href="tel:0445001212">(044) 500-12-12</a>
+            <span>Графік роботи: Пн-Пт 9:00-18:00</span>
+        </div>
+    </div>
+</header>
+<nav class="menu">
+    <a href="/admin/dashboard">Замовлення</a>
+    <a href="/tables/customers">Замовники</a>
+    <a href="/tables/deliveries">Доставки</a>
+    <a href="/tables/couriers">Кур'єри</a>
+    <a href="/statistics">Статистика</a>
+    <a href="/analysis">Аналіз</a>
+    <a href="/tables/warehouse-products">Склади та продукти</a>
+    <a href="/tables/water-stations">Станції та проби води</a>
+</nav>
+
+    <form action="/warehouseProduct/add" method="POST" class="form">
+        <div class="form-group">
+            <label for="Warehouse_id">Склад:</label>
+            <select name="Warehouse_id" required>
+                <% warehouses.forEach(warehouse => { %>
+                    <option value="<%= warehouse.Warehouse_id %>">
+                        <%= warehouse.Type %> - <%= warehouse.Address %>
+                    </option>
+                <% }); %>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="Product_name">Назва продукту:</label>
+            <input type="text" name="Product_name" required>
+        </div>
+        <div class="form-group">
+            <label for="Storage_unit">Одиниця зберігання:</label>
+            <input type="text" name="Storage_unit" required>
+        </div>
+        <div class="form-group">
+            <label for="Image_name">Назва зображення:</label>
+            <input type="text" name="Image_name" required>
+        </div>
+        <div class="form-group">
+            <label for="Details">Деталі:</label>
+            <textarea name="Details" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="Quantity">Кількість:</label>
+            <input type="number" name="Quantity" min="0" required>
+        </div>
+        <div class="form-group">
+            <label for="Price_per_unit">Ціна за одиницю:</label>
+            <input type="number" step="0.01" name="Price_per_unit" min="0" required>
+        </div>
+        <div class="form-group">
+            <label for="Change_date">Дата зміни ціни:</label>
+            <input type="date" name="Change_date" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Додати продукт</button>
+        <button type="button" class="btn btn-danger" onclick="window.history.back()">Скасувати</button>
+    </form>
+
+    <footer class="bg-light py-3 mt-4">
+        <div class="container text-center">
+            <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
+        </div>
+    </footer>
+</body>
+</html>
