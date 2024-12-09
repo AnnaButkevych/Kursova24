@@ -2,7 +2,7 @@ const { runDBCommand } = require('../db/connection');
 
 module.exports = {
     async getDashboardData(req, res) {
-        const { filterBy, searchQuery, orderStatus } = req.query; // Отримуємо параметри сортування та пошуку
+        const { filterBy, searchQuery, orderStatus } = req.query; // Отримуємо параметри
 
         // Базовий SQL-запит
         let query = `
@@ -19,26 +19,35 @@ module.exports = {
             JOIN Payment_type pt ON o.Payment_type_id = pt.Payment_type_id
         `;
 
-        // Додавання пошуку по замовленням (статус, ім'я або прізвище клієнта)
+        // Масив для динамічних умов WHERE
+        const conditions = [];
+
+        // Додавання пошуку
         if (searchQuery) {
-            query += ` WHERE o.Status LIKE '%${searchQuery}%' OR c.Name LIKE '%${searchQuery}%' OR c.Surname LIKE '%${searchQuery}%'`;
+            conditions.push(`(o.Status LIKE '%${searchQuery}%' OR c.Name LIKE '%${searchQuery}%' OR c.Surname LIKE '%${searchQuery}%')`);
         }
 
-        if (filterBy) {
-            query += ` AND o.Status = '${filterBy}'`;  // Фільтрація за статусом
+        // Додавання фільтрації за статусом
+        if (orderStatus) {
+            conditions.push(`o.Status = '${orderStatus}'`);
+        }
+
+        // Додавання умов WHERE (якщо є)
+        if (conditions.length > 0) {
+            query += ` WHERE ${conditions.join(' AND ')}`;
         }
 
         // Додавання сортування
         if (filterBy === 'date-asc') {
-            query += ' ORDER BY o.Date ASC';  // Дата (від першої до останньої)
+            query += ' ORDER BY o.Date ASC';
         } else if (filterBy === 'date-desc') {
-            query += ' ORDER BY o.Date DESC'; // Дата (від останньої до першої)
+            query += ' ORDER BY o.Date DESC';
         } else if (filterBy === 'sum-asc') {
-            query += ' ORDER BY o.Sum ASC';   // Сума (від найменшої до найбільшої)
+            query += ' ORDER BY o.Sum ASC';
         } else if (filterBy === 'sum-desc') {
-            query += ' ORDER BY o.Sum DESC';  // Сума (від найбільшої до найменшої)
+            query += ' ORDER BY o.Sum DESC';
         } else {
-            query += ' ORDER BY o.Date DESC'; // За замовчуванням сортування за датою (від останньої до першої)
+            query += ' ORDER BY o.Date DESC'; // Сортування за замовчуванням
         }
 
         try {
@@ -47,9 +56,9 @@ module.exports = {
             res.status(200).render('adminDashboard', {
                 success: true,
                 orders: ordersDetails,
-                filterBy: filterBy || '', // Якщо немає filterBy, за замовчуванням 'date-desc'
-                searchQuery: searchQuery || '', // Якщо немає searchQuery, використовуємо порожній рядок
-                orderStatus: orderStatus || '' // Якщо немає orderStatus, за замовчуванням порожній рядок
+                filterBy: filterBy || '', // Передаємо активний фільтр
+                searchQuery: searchQuery || '', // Передаємо пошуковий запит
+                orderStatus: orderStatus || '' // Передаємо активний статус
             });
         } catch (error) {
             console.error('Error in getDashboardData:', error);

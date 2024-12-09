@@ -181,12 +181,9 @@
                                 <a href="/warehouseProduct/edit/<%= row.Product_id %>" method="GET" class="edit-btn">
                                     <i class="fas fa-edit"></i> 
                                 </a>
-                                <form action="/warehouseProduct/delete" method="POST" style="display:inline-block;">
-                                    <input type="hidden" name="Product_id" value="<%= row.Product_id %>">
-                                    <button type="submit" class="delete-btn" title="Видалити продукт">
-                                        <i class="fas fa-trash-alt"></i> 
-                                    </button>
-                                </form>
+                                <button class="delete-btn" title="Видалити продукт" onclick="confirmDelete('<%= row.Product_id %>', '<%= row.Product_name %>')">
+                                    <i class="fas fa-trash-alt"></i> 
+                                </button>
                             </td>
                         </tr>
                     <% }); %>
@@ -194,6 +191,24 @@
             </table>
         </section>
     </main>
+    <script>
+        function confirmDelete(productId, productName) {
+            if (confirm(`Ви впевнені, що хочете видалити продукт: ${productName} (ID: ${productId})?`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/warehouseProduct/delete';
+
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'Product_id';
+                input.value = productId;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
     <footer class="bg-light py-3 mt-4">
         <div class="container text-center">
             <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
