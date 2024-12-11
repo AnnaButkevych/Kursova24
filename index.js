@@ -115,6 +115,9 @@ app.use('/tables/deliveries', deliveriesRouter);
 app.use('/statistics', statisticsRouter);
 app.use('/analysis', analysisRouter);
 
+const customersActionRoutes = require('./routes/customersAction');
+app.use('/tables/customers', customersActionRoutes);
+
 const warehouseProductsRouter = require('./routes/warehouseProducts');
 const waterStationsRouter = require('./routes/waterStations');
 
