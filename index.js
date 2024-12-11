@@ -81,9 +81,9 @@ const products = await runDBCommand(productsQuery);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+const reportRoutes = require('./routes/report'); 
+app.use(reportRoutes);
 
-
-// Підключення маршруту для замовлень
 const orderRoute = require('./routes/order');
 app.use('/order', orderRoute);
 
@@ -131,7 +131,6 @@ app.use('/tables/warehouse-products', warehouseProductsRoutes);
 app.use('/warehouseProduct', warehouseProductsActionRoutes);
 
 app.use('/', router);
-
 // Запуск сервера
 app.listen(PORT, async () => {
   console.log(`Сервер запущено на http://localhost:${PORT}`);
@@ -139,6 +138,7 @@ app.listen(PORT, async () => {
   // Динамічний імпорт модуля "open" для автоматичного відкриття в браузері
   const open = await import('open');
   await open.default(`http://localhost:${PORT}`);
+
 });
 
 function generateSessionId() {
