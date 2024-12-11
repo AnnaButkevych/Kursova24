@@ -144,7 +144,7 @@
                                 <a href="/tables/customers/edit/<%= customer.Customer_id %>" class="edit-btn" title="Редагувати клієнта">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="/tables/customers/delete/<%= customer.Customer_id %>" method="POST" style="display:inline;">
+                                <form action="/tables/customers/delete/<%= customer.Customer_id %>" method="POST" onsubmit="return confirmDelete(event, '<%= customer.Name %> <%= customer.Surname %>', '<%= customer.Customer_id %>')">
                                     <button type="submit" class="delete-btn" title="Видалити клієнта">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
@@ -156,6 +156,17 @@
             </table>
         </section>
     </main>
+    <script>
+        function confirmDelete(event, customerName, customerId) {
+            const confirmDelete = window.confirm(`Ви дійсно хочете видалити клієнта "${customerName}"?\n\nID клієнта: ${customerId}`);
+
+            if (!confirmDelete) {
+                event.preventDefault();
+            }
+
+            return confirmDelete;
+        }
+    </script>
     <footer class="bg-light py-3 mt-4">
         <div class="container text-center">
             <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>

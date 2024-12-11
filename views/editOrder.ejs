@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Редагувати клієнта</title>
+    <title>Редагування замовлення</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <style>
-        body {
+    body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -143,6 +143,7 @@ select:focus {
 form .form-group {
     margin-bottom: 20px;
 }
+
 </style>
 <body>
     <header>
@@ -165,32 +166,51 @@ form .form-group {
         <a href="/tables/water-stations">Станції та проби води</a>
     </nav>
     <header>
-        <h1>Редагування клієнта</h1>
+        <h3>Редагування замовлення</h3>
     </header>
-
-    <form action="/tables/customers/edit/<%= customer.Customer_id %>" method="POST">
+    <form action="/admin/edit-order/<%= order.Orders_id %>" method="POST" onsubmit="return validateForm()">
         <div>
-            <label for="name">Ім'я</label>
-            <input type="text" id="name" name="name" value="<%= customer.Name %>" required>
+            <label for="Date">Дата:</label>
+            <input type="date" id="Date" name="Date" value="<%= order.Date %>" required>
         </div>
         <div>
-            <label for="surname">Прізвище</label>
-            <input type="text" id="surname" name="surname" value="<%= customer.Surname %>" required>
+            <label for="Status">Статус:</label>
+            <select id="Status" name="Status" required>
+                <% statusOptions.forEach(status => { %>
+                    <option value="<%= status %>" <%= status === order.Status ? 'selected' : '' %>><%= status %></option>
+                <% }); %>
+            </select>
         </div>
         <div>
-            <label for="phone_number">Номер телефону</label>
-            <input type="text" id="phone_number" name="phone_number" value="<%= customer.Phone_number %>" required>
+            <label for="Sum">Сума:</label>
+            <input type="number" id="Sum" name="Sum" value="<%= order.Sum %>" required>
+            <span id="sumError" class="error"></span>
         </div>
         <div>
-            <label for="address">Адреса</label>
-            <input type="text" id="address" name="address" value="<%= customer.Address %>" required>
-        </div>
-        <div>
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="<%= customer.Email %>" required>
+            <label for="PaymentType">Тип оплати:</label>
+            <select id="PaymentType" name="PaymentType" required>
+                <% paymentTypeOptions.forEach(paymentType => { %>
+                    <option value="<%= paymentType %>" <%= paymentType === order.PaymentType ? 'selected' : '' %>><%= paymentType %></option>
+                <% }); %>
+            </select>
         </div>
         <button type="submit">Зберегти</button>
     </form>
+
+    <script>
+        function validateForm() {
+            const sumInput = document.getElementById('Sum');
+            const sumError = document.getElementById('sumError');
+
+            if (sumInput.value < 0) {
+                sumError.textContent = 'Сума не може бути відʼємною!';
+                return false;
+            } else {
+                sumError.textContent = '';
+                return true;
+            }
+        }
+    </script>
 </body>
 <footer class="bg-light py-3 mt-4">
     <div class="container text-center">

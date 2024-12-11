@@ -4,5 +4,9 @@ const adminDashboardController = require('../controllers/adminDashboardControlle
 
 router.get('/dashboard', adminDashboardController.getDashboardData);
 
+router.get('/edit-order/:id', adminDashboardController.getEditOrderForm);
+router.post('/edit-order/:id', adminDashboardController.updateOrder);
+
+router.post('/delete-order/:id', adminDashboardController.deleteOrder);
 
 module.exports = router;

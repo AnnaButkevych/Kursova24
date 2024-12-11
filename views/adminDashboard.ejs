@@ -259,8 +259,15 @@
                                 <td><%= order.CustomerName %> <%= order.CustomerSurname %></td>
                                 <td><%= order.PaymentType %></td>
                                 <td class="action-icons">
-                                    <i class="fas fa-edit edit-btn" title="Редагувати"></i>
-                                    <i class="fas fa-trash-alt delete-btn" title="Видалити"></i>
+                                    <a href="/admin/edit-order/<%= order.Orders_id %>" class="edit-btn" title="Редагувати">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                   
+                                    <form action="/admin/delete-order/<%= order.Orders_id %>" method="POST" onsubmit="return confirmDelete(event, '<%= order.Orders_id %>', '<%= order.Date %>', '<%= order.Status %>', '<%= order.Sum %>')">
+                                        <button type="submit" class="delete-btn" title="Видалити">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         <% }); %>
@@ -301,6 +308,15 @@
            
            window.location.href = url;
         });
+        function confirmDelete(event, orderId, orderDate, orderStatus, orderSum) {
+        const confirmDelete = window.confirm(`Ви дійсно хочете видалити замовлення з ID ${orderId}?\n\nДеталі замовлення:\nДата: ${orderDate}\nСтатус: ${orderStatus}\nСума: ${orderSum}\n\nЦя дія не може бути скасована.`);
+
+        if (!confirmDelete) {
+            event.preventDefault();
+        }
+
+        return confirmDelete;
+        }
     </script>
     <footer class="bg-light py-3 mt-4">
         <div class="container text-center">

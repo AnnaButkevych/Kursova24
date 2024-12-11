@@ -3,7 +3,6 @@ const { runDBCommand } = require('../db/connection');
 const fs = require('fs');
 const path = require('path');
 
-// Define font path
 const fontPath = path.join(__dirname, '../fonts/DejaVuSans.ttf'); 
 
 module.exports = {

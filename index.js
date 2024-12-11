@@ -125,7 +125,6 @@ app.use('/tables/warehouse-products', warehouseProductsRouter);
 app.use('/tables/water-stations', waterStationsRouter);
 
 const deliveryActionsRouter = require('./routes/deliveryActions');
-
 app.use('/delivery', deliveryActionsRouter);
 
 const warehouseProductsActionRoutes = require('./routes/warehouseProductsAction');
