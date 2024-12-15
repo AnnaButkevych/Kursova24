@@ -163,3 +163,75 @@ footer {
   text-align: center;
   margin-top: auto; /* Фіксація футера внизу */
 }
+.container {
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #ddd;
+}
+
+.sidebar h3 {
+  margin-bottom: 15px;
+}
+
+.sidebar form {
+  margin-bottom: 20px;
+}
+
+.sidebar label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.sidebar input,
+.sidebar select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.sidebar .btn-filter {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.sidebar .btn-filter:hover {
+  background-color: #0056b3;
+}
+/* Основний стиль для кнопки */
+.btn-primary {
+  background-color: #007bff; /* Синій колір фону */
+  color: white; /* Білий колір тексту */
+  border: none; /* Видаляємо рамку */
+  padding: 10px 20px; /* Внутрішні відступи */
+  border-radius: 5px; /* Закруглені кути */
+  cursor: pointer; /* Зміна курсору при наведенні */
+  font-size: 16px; /* Розмір тексту */
+  transition: background-color 0.3s ease; /* Плавний перехід кольору фону */
+}
+
+/* При наведенні на кнопку */
+.btn-primary:hover {
+  background-color: #0056b3; /* Темно-синій колір фону */
+}
+
+/* При натисканні на кнопку */
+.btn-primary:active {
+  background-color: #004080; /* Ще темніший синій колір фону */
+  transform: scale(0.98); /* Зменшення розміру кнопки */
+}
+
+/* При фокусі на кнопці (для доступності) */
+.btn-primary:focus {
+  outline: none; /* Видаляємо стандартний outline */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5); /* Додаємо світлу рамку */
+}
+

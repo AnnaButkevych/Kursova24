@@ -183,6 +183,77 @@
     #reset-filters-btn:hover {
         background-color: #d32f2f; /* Темніший червоний при наведенні */
     }
+    /* Стилі для контейнера фільтрів */
+.filter-section {
+    display: flex;
+    flex-wrap: wrap; /* Дозволяє переносити елементи на новий рядок */
+    gap: 15px;
+    justify-content: flex-start; /* Вирівнюємо елементи зліва */
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filter-section label {
+    font-weight: bold;
+}
+
+/* Стилі для селекту */
+.filter-select {
+    width: 250px; /* Обмежуємо ширину */
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* Стилі для групи чекбоксів */
+.checkbox-group {
+    display: flex;
+    flex-direction: column; /* Розташовуємо чекбокси вертикально */
+    gap: 10px; /* Відстань між чекбоксами */
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Відстань між текстом і чекбоксом */
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px; /* Розмір чекбокса */
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Стилі для кнопок фільтрів */
+#filter-btn, #reset-filters-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+#filter-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+#filter-btn:hover {
+    background-color: #0056b3;
+}
+
+#reset-filters-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+#reset-filters-btn:hover {
+    background-color: #d32f2f;
+}
 
     </style>
 </head>
@@ -216,17 +287,32 @@
                 <option value="sum-desc" <%= filterBy === 'sum-desc' ? 'selected' : '' %>>Сума (від найбільшої до найменшої)</option>
             </select>
 
-            <label for="order-status">Фільтрувати за статусом:</label>
-            <select id="order-status" class="filter-select">
-                <option value="">Виберіть статус</option>
-                <option value="очікує оплати" <%= filterBy === 'очікує оплати' ? 'selected' : '' %>>очікує оплати</option>
-                <option value="виконане" <%= filterBy === 'виконане' ? 'selected' : '' %>>виконане</option>
-                <option value="скасоване" <%= filterBy === 'скасоване' ? 'selected' : '' %>>скасоване</option>
-                <option value="Pending" <%= filterBy === 'Pending' ? 'selected' : '' %>>Pending</option>
-                <option value="Completed" <%= filterBy === 'Completed' ? 'selected' : '' %>>Completed</option>
-            </select>
+            <label>Фільтрувати за статусом:</label>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" name="orderStatus" value="очікує оплати" <%= orderStatus.includes('очікує оплати') ? 'checked' : '' %>>
+                    Очікує оплати
+                </label>
+                <label>
+                    <input type="checkbox" name="orderStatus" value="виконане" <%= orderStatus.includes('виконане') ? 'checked' : '' %>>
+                    Виконане
+                </label>
+                <label>
+                    <input type="checkbox" name="orderStatus" value="скасоване" <%= orderStatus.includes('скасоване') ? 'checked' : '' %>>
+                    Скасоване
+                </label>
+                <label>
+                    <input type="checkbox" name="orderStatus" value="Pending" <%= orderStatus.includes('Pending') ? 'checked' : '' %>>
+                    Pending
+                </label>
+                <label>
+                    <input type="checkbox" name="orderStatus" value="Completed" <%= orderStatus.includes('Completed') ? 'checked' : '' %>>
+                    Completed
+                </label>
+            </div>
+        
             <input type="text" id="search-orders" placeholder="Пошук замовлень" value="<%= searchQuery %>" />
-            
+        
             <button id="filter-btn">Застосувати</button>
             <button id="reset-filters-btn">Скинути фільтри</button>
         </div>
@@ -283,31 +369,37 @@
     </main>
 
     <script>
-        document.getElementById('filter-btn').addEventListener('click', function() {
-            const filterBy = document.getElementById('filter-status').value;
-            const orderStatus = document.getElementById('order-status').value;
-            const searchQuery = document.getElementById('search-orders').value;
-            
-            const url = new URL(window.location.href);
-            url.searchParams.set('filterBy', filterBy);
-            url.searchParams.set('searchQuery', searchQuery);
-            url.searchParams.set('orderStatus', orderStatus);
-            
-            window.location.href = url;
+    document.getElementById('filter-btn').addEventListener('click', function () {
+        const filterBy = document.getElementById('filter-status').value;
+        const orderStatuses = Array.from(document.querySelectorAll('input[name="orderStatus"]:checked')).map(checkbox => checkbox.value);
+        const searchQuery = document.getElementById('search-orders').value;
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('filterBy', filterBy);
+        url.searchParams.set('searchQuery', searchQuery);
+
+        // Додаємо кожен вибраний статус як окремий параметр
+        orderStatuses.forEach(status => {
+            url.searchParams.append('orderStatus', status);
         });
-        document.getElementById('reset-filters-btn').addEventListener('click', function() {
-           
-           document.getElementById('filter-status').value = '';
-           document.getElementById('order-status').value = '';
-           document.getElementById('search-orders').value = '';
-          
-           const url = new URL(window.location.href);
-           url.searchParams.delete('filterBy');
-           url.searchParams.delete('orderStatus');
-           url.searchParams.delete('searchQuery');
-           
-           window.location.href = url;
+
+        window.location.href = url.toString();
+    });
+
+    document.getElementById('reset-filters-btn').addEventListener('click', function () {
+        document.getElementById('filter-status').value = '';
+        document.querySelectorAll('input[name="orderStatus"]').forEach(checkbox => {
+            checkbox.checked = false; 
         });
+        document.getElementById('search-orders').value = '';
+
+        const url = new URL(window.location.href);
+        url.searchParams.delete('filterBy');
+        url.searchParams.delete('orderStatus');
+        url.searchParams.delete('searchQuery');
+
+        window.location.href = url.toString();
+    });
         function confirmDelete(event, orderId, orderDate, orderStatus, orderSum) {
         const confirmDelete = window.confirm(`Ви дійсно хочете видалити замовлення з ID ${orderId}?\n\nДеталі замовлення:\nДата: ${orderDate}\nСтатус: ${orderStatus}\nСума: ${orderSum}\n\nЦя дія не може бути скасована.`);
 

@@ -33,7 +33,7 @@ module.exports = {
             }));
 
             // Create a new PDF document
-            const doc = new PDFDocument();
+            const doc = new PDFDocument({ size: 'A4', margin: 50 });
 
             // Check if font exists and set the font
             if (fs.existsSync(fontPath)) {
@@ -50,16 +50,79 @@ module.exports = {
             doc.moveDown(2); // New line
 
             // Add table header
-            doc.fontSize(12).text('Дата фільтрації | Об’єм | Параметр | Значення проби | Мін. значення | Макс. значення', {
-                align: 'center',
-                underline: true
-            });
-            doc.moveDown(1); // Move to table
+            const tableHeader = [
+                'Дата фільтрації',
+                'Об’єм',
+                'Параметр',
+                'Значення проби',
+                'Мін. значення',
+                'Макс. значення'
+            ];
 
-            // Add table data
-            formattedResults.forEach(row => {
-                doc.text(`${row.Filtration_date} | ${row.Volume} | ${row.ParameterName || 'Немає'} | ${row.ProbaValue || 'Немає'} | ${row.MinValue || 'Немає'} | ${row.MaxValue || 'Немає'}`);
-            });
+            // Calculate column widths based on page width
+            const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+            const columnWidths = [120, 60, 100, 100, 100, 100]; // Ширина кожної колонки
+            const totalWidth = columnWidths.reduce((sum, width) => sum + width, 0);
+
+            // Normalize column widths if they exceed page width
+            if (totalWidth > pageWidth) {
+                const scaleFactor = pageWidth / totalWidth;
+                columnWidths.forEach((width, index) => {
+                    columnWidths[index] = width * scaleFactor;
+                });
+            }
+
+            const tableTop = doc.y; // Початкова позиція таблиці
+            const tableLeft = doc.page.margins.left; // Початкова позиція таблиці зліва
+
+            // Функція для малювання таблиці
+            function drawTable(doc, data, columnWidths, top, left) {
+                let currentY = top;
+                let currentX = left;
+
+                data.forEach((row, rowIndex) => {
+                    row.forEach((cell, cellIndex) => {
+                        // Використовуємо жирний шрифт для заголовків
+                        if (rowIndex === 0) {
+                            doc.font('DejaVuSans').fontSize(12).text(cell, currentX, currentY, { width: columnWidths[cellIndex], align: 'center' });
+                        } else {
+                            doc.font('DejaVuSans').fontSize(10).text(cell, currentX, currentY, { width: columnWidths[cellIndex], align: 'center' });
+                        }
+                        currentX += columnWidths[cellIndex];
+                    });
+                    currentY += 30; // Збільшуємо Y для наступного рядка (збільшена висота рядка)
+                    currentX = left; // Повертаємо X на початок рядка
+                });
+
+                // Малюємо рамки для таблиці
+                doc.lineWidth(0.5);
+                for (let i = 0; i <= data.length; i++) {
+                    doc.moveTo(left, top + i * 30) // Змінюємо на 30 для відповідної висоти рядка
+                        .lineTo(left + columnWidths.reduce((a, b) => a + b, 0), top + i * 30)
+                        .stroke();
+                }
+
+                for (let i = 0; i <= columnWidths.length; i++) {
+                    doc.moveTo(left + columnWidths.slice(0, i).reduce((a, b) => a + b, 0), top)
+                        .lineTo(left + columnWidths.slice(0, i).reduce((a, b) => a + b, 0), top + data.length * 30) // Змінюємо на 30
+                        .stroke();
+                }
+            }
+
+            // Додаємо заголовок таблиці
+            drawTable(doc, [tableHeader], columnWidths, tableTop, tableLeft);
+
+            // Додаємо дані таблиці
+            const tableData = formattedResults.map(row => [
+                row.Filtration_date,
+                row.Volume,
+                row.ParameterName || 'Немає',
+                row.ProbaValue || 'Немає',
+                row.MinValue || 'Немає',
+                row.MaxValue || 'Немає'
+            ]);
+
+            drawTable(doc, tableData, columnWidths, tableTop + 30, tableLeft); // Змінюємо на 30
 
             // Add report creation date
             doc.moveDown(2);

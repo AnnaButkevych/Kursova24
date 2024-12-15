@@ -29,7 +29,15 @@ module.exports = {
 
         // Додавання фільтрації за статусом
         if (orderStatus) {
-            conditions.push(`o.Status = '${orderStatus}'`);
+            // Перевіряємо, чи orderStatus є масивом
+            if (Array.isArray(orderStatus)) {
+                // Якщо це масив, створюємо умову IN
+                const statuses = orderStatus.map(status => `'${status}'`).join(', ');
+                conditions.push(`o.Status IN (${statuses})`);
+            } else {
+                // Якщо це одне значення, додаємо як звичайну умову
+                conditions.push(`o.Status = '${orderStatus}'`);
+            }
         }
 
         // Додавання умов WHERE (якщо є)
