@@ -1,0 +1,168 @@
+/* Загальні стилі для сторінки */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Система для розмітки сторінки */
+  html, body {
+    height: 100%; /* Забезпечує, що сторінка займає 100% висоти */
+    font-family: Arial, sans-serif;
+  }
+  
+  body {
+    display: flex;
+    flex-direction: column; /* Вертикальне розташування елементів */
+    height: 100%; /* Забезпечує, що весь вміст займає всю висоту */
+  }
+  
+  /* Верхня частина (наприклад, заголовок чи навігація) */
+  header {
+    background-color: #007BFF;
+    color: white;
+    padding: 20px 10%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  header .header-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  header h1 {
+    margin: 0;
+  }
+  
+  header .contact {
+    display: flex;
+    gap: 20px;
+  }
+  
+  header .contact a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  header .contact span {
+    color: white;
+  }
+  
+  header .btn {
+    background-color: #f10b0b;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  header .btn:hover {
+    background-color: #555;
+  }
+  
+  /* Основна частина сторінки */
+  main {
+    flex: 1; /* Основний контент займає весь доступний простір */
+    padding: 20px;
+    max-width: 70%; /* Основний контент займає 70% ширини */
+    margin: 0 auto; /* Центрування основного контенту */
+  }
+  
+  .hero {
+    background-color: #f0f0f0;
+    text-align: center;
+    padding: 40px 0;
+  }
+  
+  .hero h2 {
+    font-size: 2em;
+  }
+  
+  .highlight {
+    color: #007BFF;
+  }
+  
+  .products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between; /* Вирівнювання карток по ширині */
+  }
+  
+  .product {
+    flex: 1 1 calc(33% - 20px); /* Продукти займають 33% ширини */
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .product img {
+    width: 100%; /* Зменшуємо розмір картинок */
+    max-width: 150px; /* Максимальна ширина картинок */
+    height: auto; /* Зберігаємо пропорції */
+    margin-bottom: 10px;
+  }
+  
+  .product h3 {
+    margin-bottom: 10px;
+  }
+  
+  .product p {
+    margin-bottom: 10px;
+  }
+  
+  .product .price {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .product .discount {
+    text-decoration: line-through;
+    color: red;
+  }
+  
+  /* Форма для замовлення */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  form input[type="tel"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  form button {
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  form button:hover {
+    background-color: #555;
+  }
+  
+  /* Footer */
+  footer {
+    background-color: #0011cbe4;
+    color: rgb(255, 255, 255);
+    padding: 20px;
+    text-align: center;
+    margin-top: auto; /* Фіксація футера внизу */
+  }
+
+  
+  

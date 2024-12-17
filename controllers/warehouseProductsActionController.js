@@ -20,6 +20,11 @@ module.exports = {
     async addProductToWarehouse(req, res) {
         const { Warehouse_id, Product_name, Storage_unit, Image_name, Details, Quantity, Price_per_unit, Change_date } = req.body;
 
+        // Перевірка обов'язкових полів
+        if (!Warehouse_id || !Product_name || !Storage_unit || !Quantity || !Price_per_unit || !Change_date) {
+            return res.status(400).send('All required fields must be filled');
+        }
+
         const insertProductQuery = `
             INSERT INTO Product (Product_name, Storage_unit, Image_name, Details)
             VALUES ('${Product_name}', '${Storage_unit}', '${Image_name}', '${Details}')
@@ -36,9 +41,15 @@ module.exports = {
         `;
 
         try {
-            await runDBCommand(insertProductQuery); // Додаємо продукт до таблиці Product
-            await runDBCommand(insertWarehouseProductQuery); // Додаємо продукт до складу
-            await runDBCommand(priceChangeQuery); // Додаємо зміну ціни
+            // Додаємо продукт до таблиці Product
+            await runDBCommand(insertProductQuery);
+
+            // Додаємо продукт до складу
+            await runDBCommand(insertWarehouseProductQuery);
+
+            // Додаємо зміну ціни
+            await runDBCommand(priceChangeQuery);
+
             res.redirect('/tables/warehouse-products'); // Перенаправляємо на список продуктів
         } catch (error) {
             console.error('Error adding product to warehouse:', error);
@@ -83,12 +94,15 @@ module.exports = {
         }
     },
 
-    // Оновлення інформації про продукт
     async updateProductInWarehouse(req, res) {
         const { productId } = req.params;
         const { Product_name, Storage_unit, Image_name, Details, Quantity, Price_per_unit, Change_date } = req.body;
-        console.log('req.body:', req.body);
-
+    
+        // Перевірка обов'язкових полів
+        if (!productId || !Product_name || !Storage_unit || !Quantity || !Price_per_unit || !Change_date) {
+            return res.status(400).send('All required fields must be filled');
+        }
+    
         const updateProductQuery = `
             UPDATE Product
             SET 
@@ -98,93 +112,176 @@ module.exports = {
                 Details = '${Details}'
             WHERE Product_id = ${productId}
         `;
-
+    
         const updateWarehouseProductQuery = `
             UPDATE ProductsOnWarehouse
             SET Quantity = '${Quantity}'
             WHERE Product_id = ${productId}
         `;
-
+    
+        const deleteOldPriceChangeQuery = `
+            DELETE FROM Price_change
+            WHERE ProductsOnWarehouse_id = (
+                SELECT ProductsOnWarehouse_id 
+                FROM ProductsOnWarehouse 
+                WHERE Product_id = ${productId} 
+                LIMIT 1
+            )
+        `;
+    
         const priceChangeQuery = `
             INSERT INTO Price_change (ProductsOnWarehouse_id, Price_per_unit, Change_date)
             VALUES ((SELECT ProductsOnWarehouse_id FROM ProductsOnWarehouse WHERE Product_id = ${productId} LIMIT 1), ${Price_per_unit}, '${Change_date}')
         `;
-
+    
         try {
-            await runDBCommand(updateProductQuery); // Оновлюємо інформацію про продукт
-            await runDBCommand(updateWarehouseProductQuery); // Оновлюємо кількість продукту
-            await runDBCommand(priceChangeQuery); // Оновлюємо зміну ціни
+            // Оновлюємо інформацію про продукт
+            await runDBCommand(updateProductQuery);
+    
+            // Оновлюємо кількість продукту
+            await runDBCommand(updateWarehouseProductQuery);
+    
+            // Видаляємо залежні записи з Orders
+            const deleteOrdersQuery = `
+                DELETE FROM Orders
+                WHERE Busket_id IN (
+                    SELECT Busket_id
+                    FROM Busket
+                    WHERE Price_change_id IN (
+                        SELECT Price_change_id
+                        FROM Price_change
+                        WHERE ProductsOnWarehouse_id = (
+                            SELECT ProductsOnWarehouse_id 
+                            FROM ProductsOnWarehouse 
+                            WHERE Product_id = ${productId} 
+                            LIMIT 1
+                        )
+                    )
+                )
+            `;
+            await runDBCommand(deleteOrdersQuery);
+    
+            // Видаляємо залежні записи з Busket
+            const deleteBusketQuery = `
+                DELETE FROM Busket
+                WHERE Price_change_id IN (
+                    SELECT Price_change_id
+                    FROM Price_change
+                    WHERE ProductsOnWarehouse_id = (
+                        SELECT ProductsOnWarehouse_id 
+                        FROM ProductsOnWarehouse 
+                        WHERE Product_id = ${productId} 
+                        LIMIT 1
+                    )
+                )
+            `;
+            await runDBCommand(deleteBusketQuery);
+    
+            // Видаляємо старі записи з Price_change
+            await runDBCommand(deleteOldPriceChangeQuery);
+    
+            // Додаємо новий запис в Price_change
+            await runDBCommand(priceChangeQuery);
+    
             res.redirect('/tables/warehouse-products'); // Перенаправляємо на сторінку складів
         } catch (error) {
             console.error('Error updating product in warehouse:', error);
             res.status(500).send('Error updating product');
         }
     },
-
-async deleteWarehouseProduct(req, res) {
-    const { Product_id } = req.body;
-
-    // Отримання ID запису в ProductsOnWarehouse
-    const getProductsOnWarehouseIdQuery = `
-        SELECT ProductsOnWarehouse_id
-        FROM ProductsOnWarehouse
-        WHERE Product_id = ${Product_id}
-        LIMIT 1
-    `;
-
-    try {
-        // Отримуємо ProductsOnWarehouse_id
-        const result = await runDBCommand(getProductsOnWarehouseIdQuery);
-        if (!result.length) {
-            return res.status(404).send('Продукт не знайдено в складі');
+    async deleteWarehouseProduct(req, res) {
+        const { Product_id } = req.body;
+    
+        // Перевірка, чи Product_id передано
+        if (!Product_id) {
+            return res.status(400).send('Product_id is required');
         }
-
-        const productsOnWarehouseId = result[0].ProductsOnWarehouse_id;
-
-        // Видалення записів з WaterStation
-        const deleteWaterStationQuery = `
-            DELETE FROM WaterStation
-            WHERE ProductsOnWarehouse_id = ${productsOnWarehouseId}
+    
+        // Перевірка, чи Product_id є числом
+        const productId = parseInt(Product_id, 10);
+        if (isNaN(productId)) {
+            return res.status(400).send('Product_id must be a number');
+        }
+    
+        // Перевірка наявності продукту
+        const checkProductExistsQuery = `
+            SELECT Product_id
+            FROM Product
+            WHERE Product_id = ${productId}
         `;
-        await runDBCommand(deleteWaterStationQuery);
-
-        // Видалення записів з Busket
-        const deleteBusketQuery = `
-            DELETE FROM Busket
-            WHERE Price_change_id IN (
-                SELECT Price_change_id
-                FROM Price_change
+        const productExists = await runDBCommand(checkProductExistsQuery);
+        if (!productExists.length) {
+            return res.status(404).send('Продукт не знайдено');
+        }
+    
+        // Отримання ID запису в ProductsOnWarehouse
+        const getProductsOnWarehouseIdQuery = `
+            SELECT ProductsOnWarehouse_id
+            FROM ProductsOnWarehouse
+            WHERE Product_id = ${productId}
+            LIMIT 1
+        `;
+    
+        try {
+            // Отримуємо ProductsOnWarehouse_id
+            const result = await runDBCommand(getProductsOnWarehouseIdQuery);
+            if (!result.length) {
+                return res.status(404).send('Продукт не знайдено в складі');
+            }
+    
+            const productsOnWarehouseId = result[0].ProductsOnWarehouse_id;
+    
+            // Видалення залежних записів з Orders
+            const deleteOrdersQuery = `
+                DELETE FROM Orders
+                WHERE Busket_id IN (
+                    SELECT Busket_id
+                    FROM Busket
+                    WHERE Price_change_id IN (
+                        SELECT Price_change_id
+                        FROM Price_change
+                        WHERE ProductsOnWarehouse_id = ${productsOnWarehouseId}
+                    )
+                )
+            `;
+            await runDBCommand(deleteOrdersQuery);
+    
+            // Видалення залежних записів з Busket
+            const deleteBusketQuery = `
+                DELETE FROM Busket
+                WHERE Price_change_id IN (
+                    SELECT Price_change_id
+                    FROM Price_change
+                    WHERE ProductsOnWarehouse_id = ${productsOnWarehouseId}
+                )
+            `;
+            await runDBCommand(deleteBusketQuery);
+    
+            // Видалення записів з Price_change
+            const deletePriceChangeQuery = `
+                DELETE FROM Price_change
                 WHERE ProductsOnWarehouse_id = ${productsOnWarehouseId}
-            )
-        `;
-        await runDBCommand(deleteBusketQuery);
-
-        // Видалення записів з Price_change
-        const deletePriceChangeQuery = `
-            DELETE FROM Price_change
-            WHERE ProductsOnWarehouse_id = ${productsOnWarehouseId}
-        `;
-        await runDBCommand(deletePriceChangeQuery);
-
-        // Видалення записів з ProductsOnWarehouse
-        const deleteProductsOnWarehouseQuery = `
-            DELETE FROM ProductsOnWarehouse
-            WHERE Product_id = ${Product_id}
-        `;
-        await runDBCommand(deleteProductsOnWarehouseQuery);
-
-        // Видалення запису з Product
-        const deleteProductQuery = `
-            DELETE FROM Product
-            WHERE Product_id = ${Product_id}
-        `;
-        await runDBCommand(deleteProductQuery);
-
-        res.redirect('/tables/warehouse-products');
-    } catch (error) {
-        console.error('Error deleting warehouse product:', error);
-        res.status(500).send('Error deleting warehouse product');
+            `;
+            await runDBCommand(deletePriceChangeQuery);
+    
+            // Видалення записів з ProductsOnWarehouse
+            const deleteProductsOnWarehouseQuery = `
+                DELETE FROM ProductsOnWarehouse
+                WHERE Product_id = ${productId}
+            `;
+            await runDBCommand(deleteProductsOnWarehouseQuery);
+    
+            // Видалення запису з Product
+            const deleteProductQuery = `
+                DELETE FROM Product
+                WHERE Product_id = ${productId}
+            `;
+            await runDBCommand(deleteProductQuery);
+    
+            res.redirect('/tables/warehouse-products');
+        } catch (error) {
+            console.error('Error deleting warehouse product:', error);
+            res.status(500).send('Error deleting warehouse product');
+        }
     }
-}
-
 };

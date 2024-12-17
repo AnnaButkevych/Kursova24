@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Замовлення - Аквасвіт</title>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/stylesO.css">
   <!-- Bootstrap 5 для адаптивного дизайну та компонентів -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -221,7 +221,7 @@
             alert('Будь ласка, заповніть усі поля форми.');
             return;
         }
-            // Validate phone number
+        // Validate phone number
         if (!/^\d{10}$/.test(customerPhone)) {
             alert('Номер телефону має містити рівно 10 цифр!');
             return;
@@ -238,7 +238,15 @@
             alert('Довжина імені, прізвища або адреси не повинна перевищувати 100 символів!');
             return;
         }
-
+        const nameRegex = /^[A-Za-zА-Яа-яЇїІіЄєҐґ\s'-]+$/;
+        if (!nameRegex.test(customerName)) {
+            alert('Ім\'я повинно містити лише літери!');
+            return;
+        }
+        if (!nameRegex.test(customerSurname)) {
+            alert('Прізвище повинно містити лише літери!');
+            return;
+        }
         // Підготовка даних для відправлення
         const orderData = {
             customerName: customerName,
@@ -291,13 +299,15 @@
             <!-- Name -->
             <div class="mb-3">
                 <label for="customerName" class="form-label">Ім'я замовника</label>
-                <input type="text" class="form-control" id="customerName" name="customerName" maxlength="100" required>
+                <input type="text" class="form-control" id="customerName" name="customerName" maxlength="100" pattern="^[A-Za-zА-Яа-яЇїІіЄєҐґ\s'-]+$" required>
+                <div class="invalid-feedback">Будь ласка, введіть коректне ім'я (лише літери, пробіли, апострофи та дефіси).</div>
             </div>
     
             <!-- Surname -->
             <div class="mb-3">
                 <label for="customerSurname" class="form-label">Прізвище замовника</label>
-                <input type="text" class="form-control" id="customerSurname" name="customerSurname" maxlength="100" required>
+                <input type="text" class="form-control" id="customerSurname" name="customerSurname" maxlength="100" pattern="^[A-Za-zА-Яа-яЇїІіЄєҐґ\s'-]+$" required>
+                <div class="invalid-feedback">Будь ласка, введіть коректне прізвище (лише літери, пробіли, апострофи та дефіси).</div>
             </div>
     
             <!-- Phone -->

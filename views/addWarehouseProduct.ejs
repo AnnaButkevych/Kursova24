@@ -189,7 +189,7 @@ button[type="button"]:hover {
         </div>
         <div class="form-group">
             <label for="Quantity">Кількість:</label>
-            <input type="number" name="Quantity" min="0" required>
+            <input type="number" name="Quantity" min="0" max="99999" required>
         </div>
         <div class="form-group">
             <label for="Price_per_unit">Ціна за одиницю:</label>
@@ -197,7 +197,7 @@ button[type="button"]:hover {
         </div>
         <div class="form-group">
             <label for="Change_date">Дата зміни ціни:</label>
-            <input type="date" name="Change_date" required>
+            <input type="date" name="Change_date" id="Change_date" required>
         </div>
         <button type="submit" class="btn btn-primary">Додати продукт</button>
         <button type="button" class="btn btn-danger" onclick="window.history.back()">Скасувати</button>
@@ -208,5 +208,21 @@ button[type="button"]:hover {
             <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
         </div>
     </footer>
+    <script>
+        document.getElementById('Change_date').valueAsDate = new Date();
+        const imageUrlInput = document.getElementById('Image_url');
+        const form = document.querySelector('form');
+
+        form.addEventListener('submit', (event) => {
+            const urlPattern = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp))$/i;
+            if (!urlPattern.test(imageUrlInput.value)) {
+                event.preventDefault();
+                imageUrlInput.classList.add('is-invalid');
+                alert('Будь ласка, введіть дійсне посилання на зображення.');
+            } else {
+                imageUrlInput.classList.remove('is-invalid');
+            }
+        });
+    </script>
 </body>
 </html>
