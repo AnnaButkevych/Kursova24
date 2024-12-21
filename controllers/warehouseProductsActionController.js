@@ -192,18 +192,17 @@ module.exports = {
     async deleteWarehouseProduct(req, res) {
         const { Product_id } = req.body;
     
-        // Перевірка, чи Product_id передано
+        // Validate Product_id
         if (!Product_id) {
             return res.status(400).send('Product_id is required');
         }
     
-        // Перевірка, чи Product_id є числом
         const productId = parseInt(Product_id, 10);
         if (isNaN(productId)) {
             return res.status(400).send('Product_id must be a number');
         }
     
-        // Перевірка наявності продукту
+        // Check if the product exists
         const checkProductExistsQuery = `
             SELECT Product_id
             FROM Product
@@ -214,24 +213,29 @@ module.exports = {
             return res.status(404).send('Продукт не знайдено');
         }
     
-        // Отримання ID запису в ProductsOnWarehouse
+        // Get ProductsOnWarehouse_id
         const getProductsOnWarehouseIdQuery = `
             SELECT ProductsOnWarehouse_id
             FROM ProductsOnWarehouse
             WHERE Product_id = ${productId}
             LIMIT 1
         `;
+        const result = await runDBCommand(getProductsOnWarehouseIdQuery);
+        if (!result.length) {
+            return res.status(404).send('Продукт не знайдено в складі');
+        }
+    
+        const productsOnWarehouseId = result[0].ProductsOnWarehouse_id;
     
         try {
-            // Отримуємо ProductsOnWarehouse_id
-            const result = await runDBCommand(getProductsOnWarehouseIdQuery);
-            if (!result.length) {
-                return res.status(404).send('Продукт не знайдено в складі');
-            }
+            // Delete dependent records in Price_change
+            const deletePriceChangeQuery = `
+                DELETE FROM Price_change
+                WHERE ProductsOnWarehouse_id = ${productsOnWarehouseId}
+            `;
+            await runDBCommand(deletePriceChangeQuery);
     
-            const productsOnWarehouseId = result[0].ProductsOnWarehouse_id;
-    
-            // Видалення залежних записів з Orders
+            // Delete dependent records in Orders
             const deleteOrdersQuery = `
                 DELETE FROM Orders
                 WHERE Busket_id IN (
@@ -246,7 +250,7 @@ module.exports = {
             `;
             await runDBCommand(deleteOrdersQuery);
     
-            // Видалення залежних записів з Busket
+            // Delete dependent records in Busket
             const deleteBusketQuery = `
                 DELETE FROM Busket
                 WHERE Price_change_id IN (
@@ -257,21 +261,14 @@ module.exports = {
             `;
             await runDBCommand(deleteBusketQuery);
     
-            // Видалення записів з Price_change
-            const deletePriceChangeQuery = `
-                DELETE FROM Price_change
-                WHERE ProductsOnWarehouse_id = ${productsOnWarehouseId}
-            `;
-            await runDBCommand(deletePriceChangeQuery);
-    
-            // Видалення записів з ProductsOnWarehouse
+            // Delete the record in ProductsOnWarehouse
             const deleteProductsOnWarehouseQuery = `
                 DELETE FROM ProductsOnWarehouse
                 WHERE Product_id = ${productId}
             `;
             await runDBCommand(deleteProductsOnWarehouseQuery);
     
-            // Видалення запису з Product
+            // Delete the record in Product
             const deleteProductQuery = `
                 DELETE FROM Product
                 WHERE Product_id = ${productId}

@@ -41,9 +41,22 @@ module.exports = {
 
     async deleteCustomer(req, res) {
         const customerId = req.params.id;
+    
         try {
-            const query = `DELETE FROM Customer WHERE Customer_id = ${customerId}`;
-            await runDBCommand(query);
+            // Delete dependent records in Orders
+            const deleteOrdersQuery = `
+                DELETE FROM Orders
+                WHERE Customer_id = ${customerId}
+            `;
+            await runDBCommand(deleteOrdersQuery);
+    
+            // Delete the record in Customer
+            const deleteCustomerQuery = `
+                DELETE FROM Customer
+                WHERE Customer_id = ${customerId}
+            `;
+            await runDBCommand(deleteCustomerQuery);
+    
             res.redirect('/tables/customers');
         } catch (err) {
             console.error(err);

@@ -162,7 +162,7 @@ button[type="button"]:hover {
     <a href="/tables/water-stations">Станції та проби води</a>
 </nav>
 
-<form action="/warehouseProduct/edit/<%= product.Product_id %>" method="POST" class="form">
+<form action="/warehouseProduct/edit/<%= product.Product_id %>" method="POST" class="form" id="productForm">
     <div class="form-group">
         <label for="Warehouse_id">Склад:</label>
         <select name="Warehouse_id" required>
@@ -192,20 +192,51 @@ button[type="button"]:hover {
     </div>
     <div class="form-group">
         <label for="Quantity">Кількість:</label>
-        <input type="number" name="Quantity" value="<%= product.Quantity %>" min="0" required>
+        <input type="number" name="Quantity" value="<%= product.Quantity %>" min="0" max="99999" required>
     </div>
     <div class="form-group">
         <label for="Price_per_unit">Ціна за одиницю:</label>
-        <input type="number" step="0.01" name="Price_per_unit" value="<%= product.Price_per_unit %>" min="0" required>
+        <input type="number" step="0.01" name="Price_per_unit" id="Price_per_unit" value="<%= product.Price_per_unit %>" min="0" max="100000"required>
     </div>
+
     <div class="form-group">
         <label for="Change_date">Дата зміни ціни:</label>
-        <input type="date" name="Change_date" value="<%= product.Change_date %>" required>
+        <input type="date" name="Change_date" id="Change_date" value="<%= product.Change_date %>" required>
     </div>
     <button type="submit" class="btn btn-primary">Зберегти зміни</button>
     <button type="button" class="btn btn-danger" onclick="window.history.back()">Скасувати</button>
 </form>
+<script>
+    function getCurrentDate() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
 
+    function updateChangeDate() {
+        const pricePerUnitField = document.getElementById('Price_per_unit');
+        const changeDateField = document.getElementById('Change_date');
+
+        if (pricePerUnitField.value !== "<%= product.Price_per_unit %>") {
+            changeDateField.value = getCurrentDate();
+        }
+    }
+
+    document.getElementById('Price_per_unit').addEventListener('change', updateChangeDate);
+
+    window.onload = function () {
+        const changeDateField = document.getElementById('Change_date');
+        if (!changeDateField.value) {
+            changeDateField.value = getCurrentDate();
+        }
+    };
+
+    document.getElementById('productForm').addEventListener('submit', function (event) {
+        updateChangeDate();
+    });
+</script>
     <footer class="bg-light py-3 mt-4">
         <div class="container text-center">
             <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
