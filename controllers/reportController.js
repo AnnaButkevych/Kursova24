@@ -32,6 +32,11 @@ module.exports = {
                 Filtration_date: new Date(row.Filtration_date).toLocaleDateString('uk-UA'),
             }));
 
+            // Find the date range
+            const filtrationDates = results.map(row => new Date(row.Filtration_date));
+            const minDate = new Date(Math.min(...filtrationDates)).toLocaleDateString('uk-UA');
+            const maxDate = new Date(Math.max(...filtrationDates)).toLocaleDateString('uk-UA');
+
             // Create a new PDF document
             const doc = new PDFDocument({ size: 'A4', margin: 50 });
 
@@ -47,7 +52,11 @@ module.exports = {
 
             // Set the report title
             doc.fontSize(18).text('Звіт по водних станціях та пробах води', { align: 'center' });
-            doc.moveDown(2); // New line
+            doc.moveDown(1);
+
+            // Add the date range
+            doc.fontSize(12).text(`Період: з ${minDate} по ${maxDate}`, { align: 'center' });
+            doc.moveDown(2);
 
             // Add table header
             const tableHeader = [
