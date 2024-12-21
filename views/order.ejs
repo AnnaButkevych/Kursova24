@@ -100,233 +100,196 @@
     </div>
 
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const titleElement = document.getElementById('page-title');
-  if (titleElement) {
-    titleElement.addEventListener('click', () => {
-      window.location.href = '/';
-    });
-  }
-});
-
-function updateQuantity(productId, change) {
-  const quantityElement = document.getElementById(`quantity-${productId}`);
-  const productPriceElement = document.getElementById(`product-price-${productId}`);
-  const totalPriceElement = document.getElementById(`total-${productId}`);
-  let quantity = parseInt(quantityElement.innerText) || 0;
-  quantity += change;
-
-  // Отримуємо максимальну кількість продукту на складі
-  fetch(`/products/${productId}/quantity`)
-    .then(response => response.json())
-    .then(data => {
-      const maxQuantity = data.quantity;
-
-      if (quantity > maxQuantity) {
-        // Обмежуємо кількість товару в кошику
-        quantity = maxQuantity;
-        alert(`На складі залишилося лише ${maxQuantity} одиниць цього продукту. Кількість в кошику була автоматично змінена.`);
-      }
-
-      if (quantity < 0) quantity = 0;
-
-      quantityElement.innerText = quantity;
-
-      const productPrice = parseFloat(productPriceElement.textContent.replace('грн.', '').trim()) || 0;
-      const totalPrice = (productPrice * quantity).toFixed(2);
-      totalPriceElement.innerText = `${totalPrice}грн.`;
-
-      // Оновлюємо кількість на сервері
-      fetch(`/busket/${productId}?quantity=${encodeURIComponent(quantity)}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.message === 'Busket item updated successfully') {
-            console.log('Кількість оновлено на сервері');
-          } else {
-            console.error('Помилка оновлення на сервері:', data.message);
+            document.addEventListener('DOMContentLoaded', () => {
+          const titleElement = document.getElementById('page-title');
+          if (titleElement) {
+            titleElement.addEventListener('click', () => {
+              window.location.href = '/';
+            });
           }
+        });
+        function updateQuantity(productId, change) {
+        // Знайти елементи, пов'язані з продуктом
+        const quantityElement = document.getElementById(`quantity-${productId}`);
+        const productPriceElement = document.getElementById(`product-price-${productId}`);
+        const totalPriceElement = document.getElementById(`total-${productId}`);
+        let quantity = parseInt(quantityElement.innerText) || 0;
+        quantity += change;
+
+        const maxQuantity = parseInt(productPriceElement.dataset.maxQuantity) || Infinity;
+
+
+        
+        if (quantity > maxQuantity) quantity = maxQuantity;
+        if (quantity < 0) quantity = 0;
+        const totalText = totalPriceElement.innerText || totalPriceElement.textContent;
+
+        // Вилучаємо число без "грн."
+        const totalValue = parseFloat(totalText.replace('грн.', '').trim());
+        // Оновлюємо кількість на сторінці
+        quantityElement.innerText = quantity;
+
+        // Оновлюємо ціну продукту на основі його початкової ціни
+
+            const productPrice = parseFloat(productPriceElement.textContent.replace('грн.', '').trim()) || 0;
+            const totalPrice = (productPrice * quantity).toFixed(2);
+            totalPriceElement.innerText = `${totalPrice}грн.`;
+
+            fetch(`/busket/${productId}?quantity=${encodeURIComponent(quantity)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            })
+            .then(response => response.json())
+            .then(data => {
+            if (data.message === 'Busket item updated successfully') {
+                console.log('Кількість оновлено на сервері');
+            } else {
+                console.error('Помилка оновлення на сервері:', data.message);
+            }
         })
         .catch(error => {
-          console.error('Помилка при відправці запиту:', error);
+            console.error('Помилка при відправці запиту:', error);
         });
 
-      updateTotal();
-    })
-    .catch(error => {
-      console.error('Помилка при отриманні кількості продукту:', error);
-    });
-}
-
-
-// Видалення продукту з кошика
-function removeItem(productId) {
-  fetch(`/busket/${productId}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then((response) => {
-      if (response.ok) {
-        const row = document.getElementById(`product-item-${productId}`);
-        if (row) {
-          row.remove();
-          updateTotal();
+        // Оновлюємо загальну суму
+        updateTotal();
         }
-      } else {
-        response.json().then((data) => {
-          console.error('Помилка при видаленні:', data.message);
+      
+        // Видалення продукту з кошика
+        function removeItem(productId) {
+        // Відправка запиту на видалення
+        fetch(`/busket/${productId}`, {
+            method: 'DELETE',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+        })
+            .then((response) => {
+            if (response.ok) {
+                // Видаляємо елемент із таблиці
+                const row = document.getElementById(`product-item-${productId}`);
+                if (row) {
+                row.remove();
+                updateTotal();
+                }
+            } else {
+                response.json().then((data) => {
+                console.error('Помилка при видаленні:', data.message);
+                });
+            }
+            })
+            .catch((error) => console.error('Помилка запиту:', error));
+        }
+
+//todo^ call delete endpoint sql script, на фронті удалять елемент
+      
+        function makeOrder() {
+        // Отримуємо дані із кошика
+        const items = [];
+        const rows = document.querySelectorAll('[id^="product-item-"]');
+        
+        rows.forEach(row => {
+            const productId = row.id.split('-')[2];
+            const quantityElement = document.getElementById(`quantity-${productId}`);
+            const quantity = parseInt(quantityElement.innerText) || 0;
+
+            if (quantity > 0) {
+            items.push({
+                productId: productId,
+                quantity: quantity
+            });
+            }
         });
-      }
-    })
-    .catch((error) => console.error('Помилка запиту:', error));
-}
 
-function makeOrder() {
-  const items = [];
-  const rows = document.querySelectorAll('[id^="product-item-"]');
-
-  rows.forEach(row => {
-    const productId = row.id.split('-')[2];
-    const quantityElement = document.getElementById(`quantity-${productId}`);
-    const quantity = parseInt(quantityElement.innerText) || 0;
-
-    if (quantity > 0) {
-      items.push({
-        productId: productId,
-        quantity: quantity
-      });
-    }
-  });
-
-  if (items.length === 0) {
-    alert('Ваш кошик порожній! Додайте товари перед оформленням замовлення.');
-    return;
-  }
-
-  // Перевірка кількості продуктів перед оформленням замовлення
-  const checkStockPromises = items.map(item => {
-    return fetch(`/products/${item.productId}/quantity`)
-      .then(response => response.json())
-      .then(data => {
-        if (item.quantity > data.quantity) {
-          throw new Error(`На складі недостатньо продукту ${item.productId}. Залишок: ${data.quantity}. Будь ласка, зменшіть кількість в кошику.`);
+        // Перевіряємо, чи є товари в кошику
+        if (items.length === 0) {
+            alert('Ваш кошик порожній! Додайте товари перед оформленням замовлення.');
+            return;
         }
-      });
-  });
 
-  // Якщо є помилка по кількості на складі, зупинити процес оформлення
-  Promise.all(checkStockPromises)
-    .then(() => {
-      // Оформлення замовлення на дійсну кількість товарів
-      proceedWithOrder(items);
-    })
-    .catch(error => {
-      alert(`Помилка: ${error.message}`);
-    });
-}
+        // Отримуємо дані з форми замовлення
+        const customerName = document.getElementById('customerName').value.trim();
+        const customerSurname = document.getElementById('customerSurname').value.trim();
+        const customerPhone = document.getElementById('customerPhone').value.trim();
+        const paymentType = document.getElementById('paymentType').value;
+        const customerAddress = document.getElementById('customerAddress').value;
+        const customerEmail = document.getElementById('customerEmail').value;
 
-function proceedWithOrder(items) {
-  // Підготовка даних для оформлення замовлення
-  const customerName = document.getElementById('customerName').value.trim();
-  const customerSurname = document.getElementById('customerSurname').value.trim();
-  const customerPhone = document.getElementById('customerPhone').value.trim();
-  const paymentType = document.getElementById('paymentType').value;
-  const customerAddress = document.getElementById('customerAddress').value;
-  const customerEmail = document.getElementById('customerEmail').value;
-
-  if (!customerName || !customerSurname || !customerPhone || !paymentType || !customerAddress || !customerEmail) {
-    alert('Будь ласка, заповніть усі поля форми.');
-    return;
-  }
-
-  // Перевірка телефону та email
-  if (!/^\d{10}$/.test(customerPhone)) {
-    alert('Номер телефону має містити рівно 10 цифр!');
-    return;
-  }
-  if (!/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/.test(customerEmail)) {
-    alert('Введіть коректний email!');
-    return;
-  }
-
-  const orderData = {
-    customerName: customerName,
-    customerSurname: customerSurname,
-    customerPhone: customerPhone,
-    paymentType: paymentType,
-    customerAddress: customerAddress,
-    customerEmail: customerEmail,
-    items: items // передаємо інформацію про товари в замовленні
-  };
-
-  fetch('/order/add', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(orderData),
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.message === 'Order added successfully') {
-      // Зменшення кількості товарів на складі після оформлення
-      updateStockAfterOrder(items);
-      alert('Замовлення успішно оформлене!');
-      window.location.href = '/';
-    } else {
-      alert('Помилка при оформленні замовлення.');
-    }
-  })
-  .catch(error => {
-    console.error('Помилка при відправці запиту:', error);
-    alert('Сталася помилка при оформленні замовлення.');
-  });
-}
-
-// Оновлення кількості товарів на складі після оформлення замовлення
-function updateStockAfterOrder(items) {
-  items.forEach(item => {
-    fetch(`/products/${item.productId}/update-stock`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ quantity: item.quantity })
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.message !== 'Stock updated successfully') {
-          console.error('Помилка при оновленні складу:', data.message);
+        if (!customerName || !customerSurname || !customerPhone || !paymentType || !customerAddress || !customerEmail) {
+            alert('Будь ласка, заповніть усі поля форми.');
+            return;
         }
-      })
-      .catch(error => {
-        console.error('Помилка при відправці запиту на оновлення складу:', error);
-      });
-  });
-}
+        // Validate phone number
+        if (!/^\d{10}$/.test(customerPhone)) {
+            alert('Номер телефону має містити рівно 10 цифр!');
+            return;
+        }
 
-function updateTotal() {
-  let subtotal = 0;
-  const totalElements = document.querySelectorAll('[id^="total-"]');
-  totalElements.forEach(element => {
-    subtotal += parseFloat(element.innerText.replace('грн.', '').trim()) || 0;
-  });
+        // Validate email
+        if (!/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/.test(customerEmail)) {
+            alert('Введіть коректний email!');
+            return;
+        }
 
-  const subtotalElement = document.getElementById('subtotal');
-  const totalElement = document.getElementById('total');
+        // Validate length of text fields
+        if (customerName.length > 100 || customerSurname.length > 100 || customerAddress.length > 100) {
+            alert('Довжина імені, прізвища або адреси не повинна перевищувати 100 символів!');
+            return;
+        }
+        const nameRegex = /^[A-Za-zА-Яа-яЇїІіЄєҐґ\s'-]+$/;
+        if (!nameRegex.test(customerName)) {
+            alert('Ім\'я повинно містити лише літери!');
+            return;
+        }
+        if (!nameRegex.test(customerSurname)) {
+            alert('Прізвище повинно містити лише літери!');
+            return;
+        }
+        // Підготовка даних для відправлення
+        const orderData = {
+            customerName: customerName,
+            customerSurname: customerSurname,
+            customerPhone: customerPhone,
+            paymentType: paymentType,
+            customerAddress: customerAddress,
+            customerEmail: customerEmail
+        };
 
-  if (subtotalElement && totalElement) {
-    subtotalElement.innerText = `${subtotal.toFixed(2)}грн.`;
-    totalElement.innerText = `${subtotal.toFixed(2)}грн.`;
-  }
-}
+            fetch('/order/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderData),
+        });
+                // Clear the session cookie
+        document.cookie = 'connect.sid=; Max-Age=0; path=/';
 
+            fetch('/resetSession',{
+                method: 'GET'
+            });
+        alert('Замовлення успішно оформлене!');
+            window.location.href = '/';
+        }
+        
+        // Оновлення загальної суми
+        function updateTotal() {
+          let subtotal = 0;
+          const totalElements = document.querySelectorAll('[id^="total-"]');
+          totalElements.forEach(element => {
+            subtotal += parseFloat(element.innerText.replace('грн.', '').trim()) || 0;
+          });
+      
+          const subtotalElement = document.getElementById('subtotal');
+          const totalElement = document.getElementById('total');
+          
+          if (subtotalElement && totalElement) {
+            subtotalElement.innerText = `${subtotal.toFixed(2)}грн.`;
+            totalElement.innerText = `${subtotal.toFixed(2)}грн.`;
+          }
+        }
       </script>
       
 
