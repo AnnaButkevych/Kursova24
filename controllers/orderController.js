@@ -6,6 +6,7 @@ module.exports = {
   getOrders: async (req, res) => {
     try {
       const session_id = req.session.sessionId;
+
       // SQL-запит для отримання замовлень
       const ordersQuery = `
         SELECT Orders_id, 
@@ -18,23 +19,57 @@ module.exports = {
         FROM Orders`;
 
       // Query to fetch basket items
-      const busketQuery = `SELECT 
-        b.Busket_id AS id,
-        p.Product_name AS product_name,
-        pc.Price_per_unit AS product_price,
-        b.Quantity AS quantity,
-        p.Image_name,
-        (pc.Price_per_unit * b.Quantity) AS total_price
-      FROM 
-        Busket b
-      LEFT JOIN Price_change pc ON b.Price_change_id = pc.Price_change_id
-      JOIN ProductsOnWarehouse pw ON pc.ProductsOnWarehouse_id = pw.ProductsOnWarehouse_id
-      JOIN Product p ON pw.Product_id = p.Product_id
-      WHERE 
-        b.Session_id = '${session_id}';`;
+      const busketQuery = `
+        SELECT 
+          b.Busket_id AS id,
+          p.Product_name AS product_name,
+          pc.Price_per_unit AS product_price,
+          b.Quantity AS quantity,
+          p.Image_name,
+          (pc.Price_per_unit * b.Quantity) AS total_price,
+          pw.Product_id
+        FROM 
+          Busket b
+        LEFT JOIN Price_change pc ON b.Price_change_id = pc.Price_change_id
+        JOIN ProductsOnWarehouse pw ON pc.ProductsOnWarehouse_id = pw.ProductsOnWarehouse_id
+        JOIN Product p ON pw.Product_id = p.Product_id
+        WHERE 
+          b.Session_id = '${session_id}';
+      `;
 
       const busketItems = await runDBCommand(busketQuery);
-      console.log(busketItems);
+
+      // Перевірка, чи кошик не порожній
+      if (busketItems.length === 0) {
+        return res.render('order', {
+          orders: [],
+          products: [],
+          busketItems: [],
+          title: 'Замовлення - Аквасвіт',
+        });
+      }
+
+      // Отримуємо кількість продукту на складі для кожного продукту в кошику
+      const productQuantitiesQuery = `
+        SELECT 
+          pw.Product_id,
+          pw.Quantity
+        FROM 
+          ProductsOnWarehouse pw
+        WHERE 
+          pw.Product_id IN (${busketItems.map(item => item.Product_id).join(',')});
+      `;
+
+      const productQuantities = await runDBCommand(productQuantitiesQuery);
+
+      // Додаємо максимальну кількість до кожного елемента в кошику
+      const busketItemsWithMaxQuantity = busketItems.map(item => {
+        const quantity = productQuantities.find(pq => pq.Product_id === item.Product_id)?.Quantity || 0;
+        return {
+          ...item,
+          max_quantity: quantity
+        };
+      });
 
       // SQL-запит для отримання продуктів
       const productsQuery = `
@@ -58,7 +93,7 @@ module.exports = {
       res.render('order', {
         orders: formattedOrders,
         products: products,
-        busketItems: busketItems,
+        busketItems: busketItemsWithMaxQuantity,
         title: 'Замовлення - Аквасвіт',
       });
     } catch (err) {
@@ -66,7 +101,6 @@ module.exports = {
       res.status(500).send("Internal Server Error");
     }
   },
-
   // Отримання сторінки додавання замовлення
   getAddOrderPage: async (req, res) => {
     try {

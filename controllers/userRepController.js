@@ -62,7 +62,6 @@ module.exports = {
             `;
             const items = await runDBCommand(itemsQuery);
     
-            // Генерація PDF (цей код залишається без змін)
             const fontPath = path.join(__dirname, '../fonts/DejaVuSans.ttf');
             const doc = new PDFDocument();
             doc.registerFont('DejaVuSans', fontPath);
