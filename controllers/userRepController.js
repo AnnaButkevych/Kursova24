@@ -5,12 +5,11 @@ const path = require('path');
 module.exports = {
     async generatePdf(req, res) {
         try {
-            const sessionId = req.session.sessionId; // Отримуємо session_id з поточної сесії
+            const sessionId = req.session.sessionId;
             if (!sessionId) {
                 return res.status(400).json({ error: 'Session ID is required' });
             }
     
-            // Отримуємо Busket_id
             const busketQuery = `SELECT Busket_id FROM Busket WHERE Session_id = '${sessionId}';`;
             const busketResult = await runDBCommand(busketQuery);
     
@@ -20,7 +19,6 @@ module.exports = {
     
             const busketId = busketResult[0].Busket_id;
     
-            // Отримуємо інформацію про замовлення
             const orderQuery = `
                 SELECT 
                     o.Orders_id, 
@@ -48,10 +46,8 @@ module.exports = {
     
             const order = orderResult[0];
     
-            // Перевірка і перетворення order.Sum на число
             const totalSum = isNaN(order.Sum) ? 0 : Number(order.Sum);
     
-            // Отримуємо інформацію про товари
             const itemsQuery = `
                 SELECT 
                     p.Product_name, 
@@ -79,8 +75,8 @@ module.exports = {
             doc.fontSize(20).text('Order Receipt', { align: 'center' });
             doc.moveDown();
     
-            doc.fontSize(14).text(`Order ID: ${order.Orders_id}`);
-            doc.text(`Date: ${order.Date}`);
+            const formattedDate = new Date(order.Date).toLocaleDateString('uk-UA');
+            doc.fontSize(13).text(`Date: ${formattedDate}`);
             doc.text(`Customer: ${order.customer_name} ${order.customer_surname}`);
             doc.text(`Phone: ${order.Phone_number}`);
             doc.text(`Address: ${order.Address}`);
@@ -91,7 +87,6 @@ module.exports = {
     
             doc.fontSize(12).text('Order Items:', { underline: true });
             items.forEach((item, index) => {
-                // Перевірка на NaN і явне перетворення в число
                 const pricePerUnit = Number(item.price_per_unit);
                 const totalPrice = (item.Quantity * pricePerUnit).toFixed(2);
     
