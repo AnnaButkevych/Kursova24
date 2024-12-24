@@ -185,95 +185,132 @@
 
 //todo^ call delete endpoint sql script, на фронті удалять елемент
       
-        function makeOrder() {
-        // Отримуємо дані із кошика
-        const items = [];
-        const rows = document.querySelectorAll('[id^="product-item-"]');
-        
-        rows.forEach(row => {
-            const productId = row.id.split('-')[2];
-            const quantityElement = document.getElementById(`quantity-${productId}`);
-            const quantity = parseInt(quantityElement.innerText) || 0;
+function makeOrder() {
+    // Отримуємо дані із кошика
+    const items = [];
+    const rows = document.querySelectorAll('[id^="product-item-"]');
+    
+    rows.forEach(row => {
+        const productId = row.id.split('-')[2];
+        const quantityElement = document.getElementById(`quantity-${productId}`);
+        const quantity = parseInt(quantityElement.innerText) || 0;
 
-            if (quantity > 0) {
+        if (quantity > 0) {
             items.push({
                 productId: productId,
                 quantity: quantity
             });
-            }
-        });
+        }
+    });
 
-        // Перевіряємо, чи є товари в кошику
-        if (items.length === 0) {
-            alert('Ваш кошик порожній! Додайте товари перед оформленням замовлення.');
-            return;
-        }
+    // Перевіряємо, чи є товари в кошику
+    if (items.length === 0) {
+        alert('Ваш кошик порожній! Додайте товари перед оформленням замовлення.');
+        return;
+    }
 
-        // Отримуємо дані з форми замовлення
-        const customerName = document.getElementById('customerName').value.trim();
-        const customerSurname = document.getElementById('customerSurname').value.trim();
-        const customerPhone = document.getElementById('customerPhone').value.trim();
-        const paymentType = document.getElementById('paymentType').value;
-        const customerAddress = document.getElementById('customerAddress').value;
-        const customerEmail = document.getElementById('customerEmail').value;
+    // Отримуємо дані з форми замовлення
+    const customerName = document.getElementById('customerName').value.trim();
+    const customerSurname = document.getElementById('customerSurname').value.trim();
+    const customerPhone = document.getElementById('customerPhone').value.trim();
+    const paymentType = document.getElementById('paymentType').value;
+    const customerAddress = document.getElementById('customerAddress').value;
+    const customerEmail = document.getElementById('customerEmail').value;
 
-        if (!customerName || !customerSurname || !customerPhone || !paymentType || !customerAddress || !customerEmail) {
-            alert('Будь ласка, заповніть усі поля форми.');
-            return;
-        }
-        // Validate phone number
-        if (!/^\d{10}$/.test(customerPhone)) {
-            alert('Номер телефону має містити рівно 10 цифр!');
-            return;
-        }
+    if (!customerName || !customerSurname || !customerPhone || !paymentType || !customerAddress || !customerEmail) {
+        alert('Будь ласка, заповніть усі поля форми.');
+        return;
+    }
 
-        // Validate email
-        if (!/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/.test(customerEmail)) {
-            alert('Введіть коректний email!');
-            return;
-        }
+    // Validate phone number
+    if (!/^\d{10}$/.test(customerPhone)) {
+        alert('Номер телефону має містити рівно 10 цифр!');
+        return;
+    }
 
-        // Validate length of text fields
-        if (customerName.length > 100 || customerSurname.length > 100 || customerAddress.length > 100) {
-            alert('Довжина імені, прізвища або адреси не повинна перевищувати 100 символів!');
-            return;
-        }
-        const nameRegex = /^[A-Za-zА-Яа-яЇїІіЄєҐґ\s'-]+$/;
-        if (!nameRegex.test(customerName)) {
-            alert('Ім\'я повинно містити лише літери!');
-            return;
-        }
-        if (!nameRegex.test(customerSurname)) {
-            alert('Прізвище повинно містити лише літери!');
-            return;
-        }
-        // Підготовка даних для відправлення
-        const orderData = {
-            customerName: customerName,
-            customerSurname: customerSurname,
-            customerPhone: customerPhone,
-            paymentType: paymentType,
-            customerAddress: customerAddress,
-            customerEmail: customerEmail
-        };
+    // Validate email
+    if (!/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/.test(customerEmail)) {
+        alert('Введіть коректний email!');
+        return;
+    }
 
-            fetch('/order/add', {
-            method: 'POST',
+    // Validate length of text fields
+    if (customerName.length > 100 || customerSurname.length > 100 || customerAddress.length > 100) {
+        alert('Довжина імені, прізвища або адреси не повинна перевищувати 100 символів!');
+        return;
+    }
+
+    const nameRegex = /^[A-Za-zА-Яа-я\s'-]+$/;
+    if (!nameRegex.test(customerName)) {
+        alert('Ім\'я повинно містити лише літери!');
+        return;
+    }
+    if (!nameRegex.test(customerSurname)) {
+        alert('Прізвище повинно містити лише літери!');
+        return;
+    }
+
+    // Підготовка даних для відправлення
+    const orderData = {
+        customerName: customerName,
+        customerSurname: customerSurname,
+        customerPhone: customerPhone,
+        paymentType: paymentType,
+        customerAddress: customerAddress,
+        customerEmail: customerEmail,
+        items
+    };
+
+    // Відправка замовлення на сервер
+    fetch('/order/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Помилка при збереженні замовлення на сервері');
+        }
+        // Генерація PDF після успішного збереження замовлення
+        return fetch('/userRep/generate-pdf', {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(orderData),
+            
         });
-                // Clear the session cookie
-        document.cookie = 'connect.sid=; Max-Age=0; path=/';
-
-            fetch('/resetSession',{
-                method: 'GET'
-            });
-        alert('Замовлення успішно оформлене!');
-            window.location.href = '/';
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
         }
-        
+        return response.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'order_receipt.pdf'; // Ім'я файлу
+        link.click();
+    })
+    .then(() => {
+        // Очищення сесії після успішного оформлення
+        document.cookie = 'connect.sid=; Max-Age=0; path=/';
+        return fetch('/resetSession', { method: 'GET' });
+    })
+    .then(() => {
+        alert('Замовлення успішно оформлене!');
+        window.location.href = '/';
+    })
+    .catch(error => {
+        console.error('Помилка під час оформлення замовлення:', error);
+        alert('Сталася помилка. Спробуйте ще раз.');
+    });
+}
+
+
         // Оновлення загальної суми
         function updateTotal() {
           let subtotal = 0;
@@ -299,14 +336,14 @@
             <!-- Name -->
             <div class="mb-3">
                 <label for="customerName" class="form-label">Ім'я замовника</label>
-                <input type="text" class="form-control" id="customerName" name="customerName" maxlength="100" pattern="^[A-Za-zА-Яа-яЇїІіЄєҐґ\s'-]+$" required>
+                <input type="text" class="form-control" id="customerName" name="customerName" maxlength="100" required>
                 <div class="invalid-feedback">Будь ласка, введіть коректне ім'я (лише літери, пробіли, апострофи та дефіси).</div>
             </div>
-    
+
             <!-- Surname -->
             <div class="mb-3">
                 <label for="customerSurname" class="form-label">Прізвище замовника</label>
-                <input type="text" class="form-control" id="customerSurname" name="customerSurname" maxlength="100" pattern="^[A-Za-zА-Яа-яЇїІіЄєҐґ\s'-]+$" required>
+                <input type="text" class="form-control" id="customerSurname" name="customerSurname" maxlength="100" required>
                 <div class="invalid-feedback">Будь ласка, введіть коректне прізвище (лише літери, пробіли, апострофи та дефіси).</div>
             </div>
     
@@ -338,7 +375,7 @@
                 <input type="email" class="form-control" id="customerEmail" name="customerEmail" pattern="^[^@]+@[^@]+\.[a-zA-Z]{2,}$" placeholder="Введіть коректний email" required>
             </div>
  
-          <button type="submit" class="btn btn-primary" onclick="makeOrder()">Підтвердити замовлення</button>
+          <button type="button" class="btn btn-primary" onclick="makeOrder()">Підтвердити замовлення</button>
       </div>
     </main>
     <footer class="bg-light py-3 mt-4">

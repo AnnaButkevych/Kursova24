@@ -127,6 +127,9 @@ app.use('/tables/water-stations', waterStationsRouter);
 const deliveryActionsRouter = require('./routes/deliveryActions');
 app.use('/delivery', deliveryActionsRouter);
 
+const userRepRoutes = require('./routes/userRep');
+app.use('/userRep', userRepRoutes);
+
 const warehouseProductsActionRoutes = require('./routes/warehouseProductsAction');
 const warehouseProductsRoutes = require('./routes/warehouseProducts');
 app.use('/tables/warehouse-products', warehouseProductsRoutes);
