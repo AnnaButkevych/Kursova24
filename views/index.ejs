@@ -1,321 +1,401 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
-  <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-  <header>
-    <div id="page-title" class="header-container">
-      <h1 class="brand">Аквасвіт</h1>
-      <div class="contact">
-        <a href="tel:0445001212">(044) 500-12-12</a>
-        <span>Графік роботи: Пн-Пт 9:00-18:00</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div id="page-title" class="header-container">
+        <h1 class="brand">AcvaDel</h1>
+        <div class="contact">
+          <a href="tel:0445001212">(044) 500-12-12</a>
+          <span>Графік роботи: Пн-Пт 9:00-18:00</span>
+        </div>
+        <a href="/order" class="btn order-btn">Замовити воду</a>
+        <h1>Ласкаво просимо!</h1>
+        <a href="/admin" class="btn order-btn">Log in as Admin</a>
       </div>
-      <a href="/order" class="btn order-btn">Замовити воду</a>
-      <h1>Ласкаво просимо!</h1>
-      <a href="/admin" class="btn order-btn">Log in as Admin</a>
-    </div>
-  </header>
+    </header>
 
-  <div class="container">
-    <aside class="sidebar">
-      <h3>Фільтри</h3>
-      <form id="filter-form">
-        <label for="price-min">Ціна від:</label>
-        <input type="number" id="price-min" name="price-min" min="0">
+    <div class="container">
+      <aside class="sidebar">
+        <h3>Фільтри</h3>
+        <form id="filter-form">
+          <label for="price-min">Ціна від:</label>
+          <input type="number" id="price-min" name="price-min" min="0" />
 
-        <label for="price-max">Ціна до:</label>
-        <input type="number" id="price-max" name="price-max" min="0">
+          <label for="price-max">Ціна до:</label>
+          <input type="number" id="price-max" name="price-max" min="0" />
 
-        <button type="submit" class="btn btn-filter">Фільтрувати</button>
-        <button type="button" id="reset-filters" class="btn btn-reset">Скинути фільтри</button>
-      </form>
+          <button type="submit" class="btn btn-filter">Фільтрувати</button>
+          <button type="button" id="reset-filters" class="btn btn-reset">
+            Скинути фільтри
+          </button>
+        </form>
 
-      <h3>Сортування</h3>
-      <select id="sort-by">
-        <option value="price-asc">Ціна (від дешевих до дорогих)</option>
-        <option value="price-desc">Ціна (від дорогих до дешевих)</option>
-        <option value="quantity-asc">Кількість (від меншої до більшої)</option>
-        <option value="quantity-desc">Кількість (від більшої до меншої)</option>
-      </select>
+        <h3>Сортування</h3>
+        <select id="sort-by">
+          <option value="price-asc">Ціна (від дешевих до дорогих)</option>
+          <option value="price-desc">Ціна (від дорогих до дешевих)</option>
+          <option value="quantity-asc">
+            Кількість (від меншої до більшої)
+          </option>
+          <option value="quantity-desc">
+            Кількість (від більшої до меншої)
+          </option>
+        </select>
 
-      <h3>Пошук</h3>
-      <input type="text" id="search-input" placeholder="Пошук за назвою...">
-    </aside>
+        <h3>Пошук</h3>
+        <input type="text" id="search-input" placeholder="Пошук за назвою..." />
+      </aside>
 
-    <main>
-      <section class="hero">
-        <h2>КОРИСНА ВОДА <br><span class="highlight">розумна ціна</span></h2>
-      </section>
+      <main>
+        <section class="hero">
+          <h2>
+            КОРИСНА ВОДА <br /><span class="highlight">розумна ціна</span>
+          </h2>
+        </section>
 
-      <section class="products">
-        <% products.forEach(product => { %>
-          <div class="product" data-price="<%= product.Price_per_unit %>" data-quantity="<%= product.Quantity %>" data-product-id="<%= product.Product_id %>">
-            <img src="/images/<%=product.Image_name%>" alt="<%= product.Product_name %>">
+        <section class="products">
+          <% products.forEach(product => { %>
+          <div
+            class="product"
+            data-price="<%= product.Price_per_unit %>"
+            data-quantity="<%= product.Quantity %>"
+            data-product-id="<%= product.Product_id %>"
+          >
+            <img
+              src="/images/<%=product.Image_name%>"
+              alt="<%= product.Product_name %>"
+            />
             <h3><%= product.Product_name %></h3>
             <p><%= product.Details %></p>
             <div class="price">
               <span>Ціна: <%= product.Price_per_unit %> грн</span>
               <span>Кількість: <%= product.Quantity %></span>
             </div>
-            <button type="button" class="btn btn-primary add-to-basket" data-product-id="<%= product.Product_id %>">
+            <button
+              type="button"
+              class="btn btn-primary add-to-basket"
+              data-product-id="<%= product.Product_id %>"
+            >
               Додати в кошик
             </button>
           </div>
-        <% }); %>
-      </section>
-      <div id="success-message" style="display: none; position: fixed; bottom: 20px; right: 20px; background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-        Товар успішно додано до кошика!
-      </div>
-    </main>
-  </div>
-
-  <footer class="bg-light py-3 mt-4">
-    <div class="container text-center">
-      <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
+          <% }); %>
+        </section>
+        <div
+          id="success-message"
+          style="
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          "
+        >
+          Товар успішно додано до кошика!
+        </div>
+      </main>
     </div>
-  </footer>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const titleElement = document.getElementById('page-title');
-      if (titleElement) {
-        titleElement.addEventListener('click', () => {
-          window.location.href = '/';
-        });
-      }
-    });
+    <footer class="bg-light py-3 mt-4">
+      <div class="container text-center">
+        <p>&copy; 2024 AcvaDel. Усі права захищені.</p>
+      </div>
+    </footer>
 
-    document.querySelectorAll('.add-to-basket').forEach(button => {
-      button.addEventListener('click', function() {
-        const productId = this.dataset.productId;
-        fetch(`/busket/${productId}`, {
-          method: 'PUT',
-        })
-          .then(response => response.json())
-          .then(data => {
-            console.log('Response:', data);
-            const successMessage = document.getElementById('success-message');
-            successMessage.style.display = 'block';
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const titleElement = document.getElementById("page-title");
+        if (titleElement) {
+          titleElement.addEventListener("click", () => {
+            window.location.href = "/";
+          });
+        }
+      });
 
-            setTimeout(() => {
-              successMessage.style.display = 'none';
-            }, 3000);
+      document.querySelectorAll(".add-to-basket").forEach((button) => {
+        button.addEventListener("click", function () {
+          const productId = this.dataset.productId;
+          fetch(`/busket/${productId}`, {
+            method: "PUT",
           })
-          .catch(error => {
-            console.error('Error:', error);
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Response:", data);
+              const successMessage = document.getElementById("success-message");
+              successMessage.style.display = "block";
+
+              setTimeout(() => {
+                successMessage.style.display = "none";
+              }, 3000);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+      });
+
+      // Функція для фільтрації та сортування
+      function filterAndSortProducts() {
+        const priceMin =
+          parseFloat(document.getElementById("price-min").value) || 0;
+        const priceMax =
+          parseFloat(document.getElementById("price-max").value) || Infinity;
+        const sortBy = document.getElementById("sort-by").value;
+        const searchQuery = document
+          .getElementById("search-input")
+          .value.toLowerCase();
+
+        const products = document.querySelectorAll(".product");
+
+        products.forEach((product) => {
+          const price = parseFloat(product.dataset.price);
+          const quantity = parseFloat(product.dataset.quantity);
+          const productName = product
+            .querySelector("h3")
+            .textContent.toLowerCase();
+
+          const matchesSearch = productName.includes(searchQuery);
+          const matchesPrice = price >= priceMin && price <= priceMax;
+
+          if (matchesSearch && matchesPrice) {
+            product.style.display = "block";
+          } else {
+            product.style.display = "none";
+          }
+        });
+
+        // Сортування
+        const sortedProducts = Array.from(products).filter(
+          (product) => product.style.display !== "none"
+        );
+        sortedProducts.sort((a, b) => {
+          const priceA = parseFloat(a.dataset.price);
+          const priceB = parseFloat(b.dataset.price);
+          const quantityA = parseFloat(a.dataset.quantity);
+          const quantityB = parseFloat(b.dataset.quantity);
+
+          switch (sortBy) {
+            case "price-asc":
+              return priceA - priceB;
+            case "price-desc":
+              return priceB - priceA;
+            case "quantity-asc":
+              return quantityA - quantityB;
+            case "quantity-desc":
+              return quantityB - quantityA;
+            default:
+              return 0;
+          }
+        });
+
+        const productsContainer = document.querySelector(".products");
+        productsContainer.innerHTML = "";
+        sortedProducts.forEach((product) =>
+          productsContainer.appendChild(product)
+        );
+      }
+
+      // Обробник для форми фільтрації
+      document
+        .getElementById("filter-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          filterAndSortProducts();
+        });
+
+      // Обробник для поля пошуку
+      document
+        .getElementById("search-input")
+        .addEventListener("input", filterAndSortProducts);
+
+      // Обробник для вибору сортування
+      document
+        .getElementById("sort-by")
+        .addEventListener("change", filterAndSortProducts);
+
+      // Зберігаємо початковий порядок продуктів під час завантаження сторінки
+      document.addEventListener("DOMContentLoaded", () => {
+        const productsContainer = document.querySelector(".products");
+        const initialProducts = Array.from(productsContainer.children);
+
+        document
+          .getElementById("reset-filters")
+          .addEventListener("click", function () {
+            // Очищаємо поля фільтрів та пошуку
+            document.getElementById("price-min").value = "";
+            document.getElementById("price-max").value = "";
+            document.getElementById("search-input").value = "";
+            document.getElementById("sort-by").value = "price-asc"; // Встановлюємо сортування за замовчуванням
+
+            // Показуємо всі продукти
+            const products = document.querySelectorAll(".product");
+            products.forEach((product) => {
+              product.style.display = "block";
+            });
+
+            // Повертаємо продукти до початкового порядку
+            productsContainer.innerHTML = ""; // Очищаємо контейнер
+            initialProducts.forEach((product) =>
+              productsContainer.appendChild(product)
+            ); // Додаємо продукти у початковому порядку
           });
       });
-    });
 
-    // Функція для фільтрації та сортування
-    function filterAndSortProducts() {
-      const priceMin = parseFloat(document.getElementById('price-min').value) || 0;
-      const priceMax = parseFloat(document.getElementById('price-max').value) || Infinity;
-      const sortBy = document.getElementById('sort-by').value;
-      const searchQuery = document.getElementById('search-input').value.toLowerCase();
+      function makeOrder() {
+        // Отримуємо дані із кошика
+        const items = [];
+        const rows = document.querySelectorAll('[id^="product-item-"]');
 
-      const products = document.querySelectorAll('.product');
+        rows.forEach((row) => {
+          const productId = row.id.split("-")[2];
+          const quantityElement = document.getElementById(
+            `quantity-${productId}`
+          );
+          const quantity = parseInt(quantityElement.innerText) || 0;
 
-      products.forEach(product => {
-        const price = parseFloat(product.dataset.price);
-        const quantity = parseFloat(product.dataset.quantity);
-        const productName = product.querySelector('h3').textContent.toLowerCase();
-
-        const matchesSearch = productName.includes(searchQuery);
-        const matchesPrice = price >= priceMin && price <= priceMax;
-
-        if (matchesSearch && matchesPrice) {
-          product.style.display = 'block';
-        } else {
-          product.style.display = 'none';
-        }
-      });
-
-      // Сортування
-      const sortedProducts = Array.from(products).filter(product => product.style.display !== 'none');
-      sortedProducts.sort((a, b) => {
-        const priceA = parseFloat(a.dataset.price);
-        const priceB = parseFloat(b.dataset.price);
-        const quantityA = parseFloat(a.dataset.quantity);
-        const quantityB = parseFloat(b.dataset.quantity);
-
-        switch (sortBy) {
-          case 'price-asc':
-            return priceA - priceB;
-          case 'price-desc':
-            return priceB - priceA;
-          case 'quantity-asc':
-            return quantityA - quantityB;
-          case 'quantity-desc':
-            return quantityB - quantityA;
-          default:
-            return 0;
-        }
-      });
-
-      const productsContainer = document.querySelector('.products');
-      productsContainer.innerHTML = '';
-      sortedProducts.forEach(product => productsContainer.appendChild(product));
-    }
-
-    // Обробник для форми фільтрації
-    document.getElementById('filter-form').addEventListener('submit', function (e) {
-      e.preventDefault();
-      filterAndSortProducts();
-    });
-
-    // Обробник для поля пошуку
-    document.getElementById('search-input').addEventListener('input', filterAndSortProducts);
-
-    // Обробник для вибору сортування
-    document.getElementById('sort-by').addEventListener('change', filterAndSortProducts);
-
-    // Зберігаємо початковий порядок продуктів під час завантаження сторінки
-    document.addEventListener('DOMContentLoaded', () => {
-      const productsContainer = document.querySelector('.products');
-      const initialProducts = Array.from(productsContainer.children);
-
-      document.getElementById('reset-filters').addEventListener('click', function () {
-        // Очищаємо поля фільтрів та пошуку
-        document.getElementById('price-min').value = '';
-        document.getElementById('price-max').value = '';
-        document.getElementById('search-input').value = '';
-        document.getElementById('sort-by').value = 'price-asc'; // Встановлюємо сортування за замовчуванням
-
-        // Показуємо всі продукти
-        const products = document.querySelectorAll('.product');
-        products.forEach(product => {
-          product.style.display = 'block';
+          if (quantity > 0) {
+            items.push({
+              productId: productId,
+              quantity: quantity,
+            });
+          }
         });
 
-        // Повертаємо продукти до початкового порядку
-        productsContainer.innerHTML = ''; // Очищаємо контейнер
-        initialProducts.forEach(product => productsContainer.appendChild(product)); // Додаємо продукти у початковому порядку
-      });
-    });
-
-    function makeOrder() {
-    // Отримуємо дані із кошика
-    const items = [];
-    const rows = document.querySelectorAll('[id^="product-item-"]');
-
-    rows.forEach(row => {
-        const productId = row.id.split('-')[2];
-        const quantityElement = document.getElementById(`quantity-${productId}`);
-        const quantity = parseInt(quantityElement.innerText) || 0;
-
-        if (quantity > 0) {
-            items.push({
-                productId: productId,
-                quantity: quantity
-            });
+        // Перевіряємо, чи є товари в кошику
+        if (items.length === 0) {
+          alert(
+            "Ваш кошик порожній! Додайте товари перед оформленням замовлення."
+          );
+          return;
         }
-    });
 
-    // Перевіряємо, чи є товари в кошику
-    if (items.length === 0) {
-        alert('Ваш кошик порожній! Додайте товари перед оформленням замовлення.');
-        return;
-    }
-
-    // Перевірка кількості продукту на складі
-    const checkStockPromises = items.map(item => {
-        return fetch(`/products/${item.productId}/quantity`)
-            .then(response => response.json())
-            .then(data => {
-                if (item.quantity > data.quantity) {
-                    throw new Error(`На складі недостатньо продукту ${item.productId}. Залишок: ${data.quantity}`);
-                }
+        // Перевірка кількості продукту на складі
+        const checkStockPromises = items.map((item) => {
+          return fetch(`/products/${item.productId}/quantity`)
+            .then((response) => response.json())
+            .then((data) => {
+              if (item.quantity > data.quantity) {
+                throw new Error(
+                  `На складі недостатньо продукту ${item.productId}. Залишок: ${data.quantity}`
+                );
+              }
             });
-    });
+        });
 
-    Promise.all(checkStockPromises)
-        .then(() => {
+        Promise.all(checkStockPromises)
+          .then(() => {
             // Якщо всі перевірки пройшли успішно, продовжуємо оформлення замовлення
-            const customerName = document.getElementById('customerName').value.trim();
-            const customerSurname = document.getElementById('customerSurname').value.trim();
-            const customerPhone = document.getElementById('customerPhone').value.trim();
-            const paymentType = document.getElementById('paymentType').value;
-            const customerAddress = document.getElementById('customerAddress').value;
-            const customerEmail = document.getElementById('customerEmail').value;
+            const customerName = document
+              .getElementById("customerName")
+              .value.trim();
+            const customerSurname = document
+              .getElementById("customerSurname")
+              .value.trim();
+            const customerPhone = document
+              .getElementById("customerPhone")
+              .value.trim();
+            const paymentType = document.getElementById("paymentType").value;
+            const customerAddress =
+              document.getElementById("customerAddress").value;
+            const customerEmail =
+              document.getElementById("customerEmail").value;
 
-            if (!customerName || !customerSurname || !customerPhone || !paymentType || !customerAddress || !customerEmail) {
-                alert('Будь ласка, заповніть усі поля форми.');
-                return;
+            if (
+              !customerName ||
+              !customerSurname ||
+              !customerPhone ||
+              !paymentType ||
+              !customerAddress ||
+              !customerEmail
+            ) {
+              alert("Будь ласка, заповніть усі поля форми.");
+              return;
             }
 
             // Validate phone number
             if (!/^\d{10}$/.test(customerPhone)) {
-                alert('Номер телефону має містити рівно 10 цифр!');
-                return;
+              alert("Номер телефону має містити рівно 10 цифр!");
+              return;
             }
 
             // Validate email
             if (!/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/.test(customerEmail)) {
-                alert('Введіть коректний email!');
-                return;
+              alert("Введіть коректний email!");
+              return;
             }
 
             // Validate length of text fields
-            if (customerName.length > 100 || customerSurname.length > 100 || customerAddress.length > 100) {
-                alert('Довжина імені, прізвища або адреси не повинна перевищувати 100 символів!');
-                return;
+            if (
+              customerName.length > 100 ||
+              customerSurname.length > 100 ||
+              customerAddress.length > 100
+            ) {
+              alert(
+                "Довжина імені, прізвища або адреси не повинна перевищувати 100 символів!"
+              );
+              return;
             }
 
             const nameRegex = /^[A-Za-zА-Яа-яЇїІіЄєҐґ\s'-]+$/;
             if (!nameRegex.test(customerName)) {
-                alert('Ім\'я повинно містити лише літери!');
-                return;
+              alert("Ім'я повинно містити лише літери!");
+              return;
             }
             if (!nameRegex.test(customerSurname)) {
-                alert('Прізвище повинно містити лише літери!');
-                return;
+              alert("Прізвище повинно містити лише літери!");
+              return;
             }
 
             // Підготовка даних для відправлення
             const orderData = {
-                customerName: customerName,
-                customerSurname: customerSurname,
-                customerPhone: customerPhone,
-                paymentType: paymentType,
-                customerAddress: customerAddress,
-                customerEmail: customerEmail
+              customerName: customerName,
+              customerSurname: customerSurname,
+              customerPhone: customerPhone,
+              paymentType: paymentType,
+              customerAddress: customerAddress,
+              customerEmail: customerEmail,
             };
 
-            fetch('/order/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(orderData),
+            fetch("/order/add", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(orderData),
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message === 'Order added successfully') {
-                    // Оновлення кількості продукту на сторінці
-                    items.forEach(item => {
-                        updateProductQuantity(item.productId);
-                    });
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.message === "Order added successfully") {
+                  // Оновлення кількості продукту на сторінці
+                  items.forEach((item) => {
+                    updateProductQuantity(item.productId);
+                  });
 
-                    alert('Замовлення успішно оформлене!');
-                    window.location.href = '/';
+                  alert("Замовлення успішно оформлене!");
+                  window.location.href = "/";
                 } else {
-                    alert('Помилка при оформленні замовлення.');
+                  alert("Помилка при оформленні замовлення.");
                 }
-            })
-            .catch(error => {
-                console.error('Помилка при відправці запиту:', error);
-                alert('Сталася помилка при оформленні замовлення.');
-            });
-        })
-        .catch(error => {
+              })
+              .catch((error) => {
+                console.error("Помилка при відправці запиту:", error);
+                alert("Сталася помилка при оформленні замовлення.");
+              });
+          })
+          .catch((error) => {
             alert(`Помилка: ${error.message}`);
-        });
-}
-  </script>
-</body>
+          });
+      }
+    </script>
+  </body>
 </html>

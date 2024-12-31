@@ -1,5 +1,5 @@
 const { runDBCommand } = require("../db/connection");
-const mysql = require('mysql2');
+const mysql = require("mysql2");
 
 module.exports = {
   // Отримання всіх замовлень з можливістю фільтрації, пошуку та сортування
@@ -41,11 +41,11 @@ module.exports = {
 
       // Перевірка, чи кошик не порожній
       if (busketItems.length === 0) {
-        return res.render('order', {
+        return res.render("order", {
           orders: [],
           products: [],
           busketItems: [],
-          title: 'Замовлення - Аквасвіт',
+          title: "Замовлення - AcvaDel",
         });
       }
 
@@ -57,17 +57,21 @@ module.exports = {
         FROM 
           ProductsOnWarehouse pw
         WHERE 
-          pw.Product_id IN (${busketItems.map(item => item.Product_id).join(',')});
+          pw.Product_id IN (${busketItems
+            .map((item) => item.Product_id)
+            .join(",")});
       `;
 
       const productQuantities = await runDBCommand(productQuantitiesQuery);
 
       // Додаємо максимальну кількість до кожного елемента в кошику
-      const busketItemsWithMaxQuantity = busketItems.map(item => {
-        const quantity = productQuantities.find(pq => pq.Product_id === item.Product_id)?.Quantity || 0;
+      const busketItemsWithMaxQuantity = busketItems.map((item) => {
+        const quantity =
+          productQuantities.find((pq) => pq.Product_id === item.Product_id)
+            ?.Quantity || 0;
         return {
           ...item,
-          max_quantity: quantity
+          max_quantity: quantity,
         };
       });
 
@@ -84,17 +88,17 @@ module.exports = {
       const products = await runDBCommand(productsQuery);
 
       // Форматування замовлень
-      const formattedOrders = orders.map(order => ({
+      const formattedOrders = orders.map((order) => ({
         ...order,
-        formatted_order_date: new Date(order.Date).toLocaleDateString('uk-UA'),
+        formatted_order_date: new Date(order.Date).toLocaleDateString("uk-UA"),
       }));
 
       // Передача даних у шаблон
-      res.render('order', {
+      res.render("order", {
         orders: formattedOrders,
         products: products,
         busketItems: busketItemsWithMaxQuantity,
-        title: 'Замовлення - Аквасвіт',
+        title: "Замовлення - AcvaDel",
       });
     } catch (err) {
       console.error(err);
@@ -121,7 +125,14 @@ module.exports = {
   addOrder: async (req, res) => {
     try {
       const session_id = req.session.sessionId;
-      const { customerName, customerSurname, customerPhone, paymentType, customerAddress, customerEmail } = req.body;
+      const {
+        customerName,
+        customerSurname,
+        customerPhone,
+        paymentType,
+        customerAddress,
+        customerEmail,
+      } = req.body;
 
       // Отримуємо загальну суму замовлення
       const getProductSumQuery = `
@@ -157,7 +168,9 @@ module.exports = {
       const deliveryId = parseInt(deliveryResult.insertId, 10);
 
       if (isNaN(customerId) || isNaN(deliveryId)) {
-        throw new Error('Invalid customerResult or deliveryResult. They must be valid integers.');
+        throw new Error(
+          "Invalid customerResult or deliveryResult. They must be valid integers."
+        );
       }
 
       // Отримуємо ID кошика
@@ -196,7 +209,7 @@ module.exports = {
         await runDBCommand(updateStockQuery);
       }
 
-      res.status(200).json({ message: 'Order added successfully' });
+      res.status(200).json({ message: "Order added successfully" });
     } catch (err) {
       console.error("Error adding order:", err);
       res.status(500).send("Сталася помилка при додаванні замовлення.");
@@ -222,10 +235,12 @@ module.exports = {
       const deleteBusketQuery = `DELETE FROM Busket WHERE Busket_id = ?`;
       await runDBCommand(deleteBusketQuery, [busketId]);
 
-      res.status(200).json({ message: 'Busket item deleted successfully' });
+      res.status(200).json({ message: "Busket item deleted successfully" });
     } catch (err) {
-      console.error('Error deleting busket item:', err);
-      res.status(500).json({ message: 'Error deleting busket item', error: err.message });
+      console.error("Error deleting busket item:", err);
+      res
+        .status(500)
+        .json({ message: "Error deleting busket item", error: err.message });
     }
-  }
+  },
 };

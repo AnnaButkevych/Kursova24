@@ -1,200 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Редагувати клієнта</title>
-    <link rel="stylesheet" href="/styles.css">
-</head>
-<style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
-        header {
-            background-color: #007bff;
-            color: #fff;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .brand {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .contact {
-            font-size: 0.9rem;
-        }
-        .contact a {
-            color: #fff;
-            text-decoration: none;
-            margin-right: 15px;
-        }
-        .menu {
-            background-color: #f4f4f4;
-            padding: 10px 20px;
-            display: flex;
-            gap: 20px;
-        }
-        .menu a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-        .menu a:hover {
-            text-decoration: underline;
-        }
-        .admin-dashboard {
-            padding: 20px;
-        }
-        .dashboard-section {
-            background-color: #f4f4f4;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 100%;
-        }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f0f0f0;
-        }
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+    header {
+      background-color: #007bff;
+      color: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .contact {
+      font-size: 0.9rem;
+    }
+    .contact a {
+      color: #fff;
+      text-decoration: none;
+      margin-right: 15px;
+    }
+    .menu {
+      background-color: #f4f4f4;
+      padding: 10px 20px;
+      display: flex;
+      gap: 20px;
+    }
+    .menu a {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+    }
+    .menu a:hover {
+      text-decoration: underline;
+    }
+    .admin-dashboard {
+      padding: 20px;
+    }
+    .dashboard-section {
+      background-color: #f4f4f4;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 100%;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    table,
+    th,
+    td {
+      border: 1px solid #ccc;
+    }
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
 
-/* Стиль для форми */
-form {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    margin: 30px auto;
-}
+    /* Стиль для форми */
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      margin: 30px auto;
+    }
 
-label {
-    display: block;
-    font-size: 1rem;
-    margin: 10px 0 5px;
-}
+    label {
+      display: block;
+      font-size: 1rem;
+      margin: 10px 0 5px;
+    }
 
-input[type="text"],
-select {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 20px;
-}
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
 
-button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
 
-button[type="submit"] {
-    background-color: #007bff;
-    color: white;
-}
+    button[type="submit"] {
+      background-color: #007bff;
+      color: white;
+    }
 
-button[type="submit"]:hover {
-    background-color: #0056b3;
-}
+    button[type="submit"]:hover {
+      background-color: #0056b3;
+    }
 
-button[type="button"] {
-    background-color: #f44336;
-    color: white;
-    margin-left: 10px;
-}
+    button[type="button"] {
+      background-color: #f44336;
+      color: white;
+      margin-left: 10px;
+    }
 
-button[type="button"]:hover {
-    background-color: #d32f2f;
-}
+    button[type="button"]:hover {
+      background-color: #d32f2f;
+    }
 
-/* Кроки для кращої видимості */
-input[type="text"]:focus,
-select:focus {
-    outline: none;
-    border-color: #007bff;
-}
+    /* Кроки для кращої видимості */
+    input[type="text"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #007bff;
+    }
 
-form .form-group {
-    margin-bottom: 20px;
-}
-</style>
-<body>
+    form .form-group {
+      margin-bottom: 20px;
+    }
+  </style>
+  <body>
     <header>
-        <div id="page-title" class="header-container">
-            <h1 class="brand">Аквасвіт</h1>
-            <div class="contact">
-                <a href="tel:0445001212">(044) 500-12-12</a>
-                <span>Графік роботи: Пн-Пт 9:00-18:00</span>
-            </div>
+      <div id="page-title" class="header-container">
+        <h1 class="brand">AcvaDel</h1>
+        <div class="contact">
+          <a href="tel:0445001212">(044) 500-12-12</a>
+          <span>Графік роботи: Пн-Пт 9:00-18:00</span>
         </div>
+      </div>
     </header>
     <nav class="menu">
-        <a href="/admin/dashboard">Замовлення</a>
-        <a href="/tables/customers">Замовники</a>
-        <a href="/tables/deliveries">Доставки</a>
-        <a href="/tables/couriers">Кур'єри</a>
-        <a href="/statistics">Статистика</a>
-        <a href="/analysis">Аналіз</a>
-        <a href="/tables/warehouse-products">Склади та продукти</a>
-        <a href="/tables/water-stations">Станції та проби води</a>
+      <a href="/admin/dashboard">Замовлення</a>
+      <a href="/tables/customers">Замовники</a>
+      <a href="/tables/deliveries">Доставки</a>
+      <a href="/tables/couriers">Кур'єри</a>
+      <a href="/statistics">Статистика</a>
+      <a href="/analysis">Аналіз</a>
+      <a href="/tables/warehouse-products">Склади та продукти</a>
+      <a href="/tables/water-stations">Станції та проби води</a>
     </nav>
     <header>
-        <h1>Редагування клієнта</h1>
+      <h1>Редагування клієнта</h1>
     </header>
 
-    <form action="/tables/customers/edit/<%= customer.Customer_id %>" method="POST">
-        <div>
-            <label for="name">Ім'я</label>
-            <input type="text" id="name" name="name" value="<%= customer.Name %>" required>
-        </div>
-        <div>
-            <label for="surname">Прізвище</label>
-            <input type="text" id="surname" name="surname" value="<%= customer.Surname %>" required>
-        </div>
-        <div>
-            <label for="phone_number">Номер телефону</label>
-            <input type="text" id="phone_number" name="phone_number" value="<%= customer.Phone_number %>" required>
-        </div>
-        <div>
-            <label for="address">Адреса</label>
-            <input type="text" id="address" name="address" value="<%= customer.Address %>" required>
-        </div>
-        <div>
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="<%= customer.Email %>" required>
-        </div>
-        <button type="submit">Зберегти</button>
+    <form
+      action="/tables/customers/edit/<%= customer.Customer_id %>"
+      method="POST"
+    >
+      <div>
+        <label for="name">Ім'я</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value="<%= customer.Name %>"
+          required
+        />
+      </div>
+      <div>
+        <label for="surname">Прізвище</label>
+        <input
+          type="text"
+          id="surname"
+          name="surname"
+          value="<%= customer.Surname %>"
+          required
+        />
+      </div>
+      <div>
+        <label for="phone_number">Номер телефону</label>
+        <input
+          type="text"
+          id="phone_number"
+          name="phone_number"
+          value="<%= customer.Phone_number %>"
+          required
+        />
+      </div>
+      <div>
+        <label for="address">Адреса</label>
+        <input
+          type="text"
+          id="address"
+          name="address"
+          value="<%= customer.Address %>"
+          required
+        />
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value="<%= customer.Email %>"
+          required
+        />
+      </div>
+      <button type="submit">Зберегти</button>
     </form>
-</body>
-<footer class="bg-light py-3 mt-4">
+  </body>
+  <footer class="bg-light py-3 mt-4">
     <div class="container text-center">
-        <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
+      <p>&copy; 2024 AcvaDel. Усі права захищені.</p>
     </div>
   </footer>
 </html>

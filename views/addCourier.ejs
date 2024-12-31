@@ -1,151 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Додавання кур'єра - Адмін Панель</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
-        header {
-            background-color: #007bff;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        h1 {
-            margin: 0;
-        }
-        nav.menu {
-            background-color: #f4f4f4;
-            padding: 10px 20px;
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-        nav.menu a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-        nav.menu a:hover {
-            text-decoration: underline;
-        }
-        form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            margin: 30px auto;
-        }
-        label {
-            display: block;
-            font-size: 1rem;
-            margin: 10px 0 5px;
-        }
-        input[type="text"],
-        select {
-            width: 100%;
-            padding: 10px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button[type="submit"] {
-            background-color: #007bff;
-            color: white;
-        }
-        button[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        button[type="button"] {
-            background-color: #f44336;
-            color: white;
-            margin-left: 10px;
-        }
-        button[type="button"]:hover {
-            background-color: #d32f2f;
-        }
-        .error-message {
-            color: red;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+      }
+      header {
+        background-color: #007bff;
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      h1 {
+        margin: 0;
+      }
+      nav.menu {
+        background-color: #f4f4f4;
+        padding: 10px 20px;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+      }
+      nav.menu a {
+        text-decoration: none;
+        color: #007bff;
+        font-weight: bold;
+      }
+      nav.menu a:hover {
+        text-decoration: underline;
+      }
+      form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: 30px auto;
+      }
+      label {
+        display: block;
+        font-size: 1rem;
+        margin: 10px 0 5px;
+      }
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button[type="submit"] {
+        background-color: #007bff;
+        color: white;
+      }
+      button[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+      button[type="button"] {
+        background-color: #f44336;
+        color: white;
+        margin-left: 10px;
+      }
+      button[type="button"]:hover {
+        background-color: #d32f2f;
+      }
+      .error-message {
+        color: red;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <h1>Додавання кур'єра</h1>
+      <h1>Додавання кур'єра</h1>
     </header>
     <nav class="menu">
-        <a href="/admin/dashboard">Замовлення</a>
-        <a href="/tables/customers">Замовники</a>
-        <a href="/tables/deliveries">Доставки</a>
-        <a href="/tables/couriers">Кур'єри</a>
-        <a href="/statistics">Статистика</a>
-        <a href="/analysis">Аналіз</a>
-        <a href="/tables/warehouse-products">Склади та продукти</a>
-        <a href="/tables/water-stations">Станції та проби води</a>
+      <a href="/admin/dashboard">Замовлення</a>
+      <a href="/tables/customers">Замовники</a>
+      <a href="/tables/deliveries">Доставки</a>
+      <a href="/tables/couriers">Кур'єри</a>
+      <a href="/statistics">Статистика</a>
+      <a href="/analysis">Аналіз</a>
+      <a href="/tables/warehouse-products">Склади та продукти</a>
+      <a href="/tables/water-stations">Станції та проби води</a>
     </nav>
 
     <form action="/courierActions/add" method="POST" id="addCourierForm">
-        <label for="Name">Ім'я:</label>
-        <input type="text" name="Name" placeholder="Введіть ім'я" required>
+      <label for="Name">Ім'я:</label>
+      <input type="text" name="Name" placeholder="Введіть ім'я" required />
 
-        <label for="Surname">Прізвище:</label>
-        <input type="text" name="Surname" placeholder="Введіть прізвище" required>
+      <label for="Surname">Прізвище:</label>
+      <input
+        type="text"
+        name="Surname"
+        placeholder="Введіть прізвище"
+        required
+      />
 
-        <label for="Phone_number">Телефон:</label>
-        <input type="text" name="Phone_number" id="Phone_number" placeholder="Введіть номер телефону" required>
-        <div class="error-message" id="phoneError"></div>
+      <label for="Phone_number">Телефон:</label>
+      <input
+        type="text"
+        name="Phone_number"
+        id="Phone_number"
+        placeholder="Введіть номер телефону"
+        required
+      />
+      <div class="error-message" id="phoneError"></div>
 
-        <label for="Courier_status">Статус:</label>
-        <select name="Courier_status" required>
-            <option value="Вільний">Вільний</option>
-            <option value="Зайнятий">Зайнятий</option>
-            <option value="Відсутній">Відсутній</option>
-        </select>
+      <label for="Courier_status">Статус:</label>
+      <select name="Courier_status" required>
+        <option value="Вільний">Вільний</option>
+        <option value="Зайнятий">Зайнятий</option>
+        <option value="Відсутній">Відсутній</option>
+      </select>
 
-        <button type="submit">Додати</button>
-        <button type="button" onclick="window.history.back()">Скасувати</button>
+      <button type="submit">Додати</button>
+      <button type="button" onclick="window.history.back()">Скасувати</button>
     </form>
 
     <footer class="bg-light py-3 mt-4">
-        <div class="container text-center">
-            <p>&copy; 2024 Аквасвіт. Усі права захищені.</p>
-        </div>
+      <div class="container text-center">
+        <p>&copy; 2024 AcvaDel. Усі права захищені.</p>
+      </div>
     </footer>
 
     <script>
-        document.getElementById('addCourierForm').addEventListener('submit', function(event) {
-            const phoneInput = document.getElementById('Phone_number');
-            const phoneError = document.getElementById('phoneError');
+      document
+        .getElementById("addCourierForm")
+        .addEventListener("submit", function (event) {
+          const phoneInput = document.getElementById("Phone_number");
+          const phoneError = document.getElementById("phoneError");
 
-            // Регулярний вираз для перевірки номера телефону (точно 10 цифр)
-            const phoneRegex = /^\d{10}$/;
+          // Регулярний вираз для перевірки номера телефону (точно 10 цифр)
+          const phoneRegex = /^\d{10}$/;
 
-            if (!phoneRegex.test(phoneInput.value)) {
-                event.preventDefault(); // Запобігає відправленню форми
-                phoneError.textContent = 'Номер телефону має містити рівно 10 цифр!';
-            } else {
-                phoneError.textContent = ''; // Очищення помилки
-            }
+          if (!phoneRegex.test(phoneInput.value)) {
+            event.preventDefault(); // Запобігає відправленню форми
+            phoneError.textContent =
+              "Номер телефону має містити рівно 10 цифр!";
+          } else {
+            phoneError.textContent = ""; // Очищення помилки
+          }
         });
     </script>
-</body>
+  </body>
 </html>
