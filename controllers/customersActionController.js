@@ -43,14 +43,12 @@ module.exports = {
         const customerId = req.params.id;
     
         try {
-            // Delete dependent records in Orders
             const deleteOrdersQuery = `
                 DELETE FROM Orders
                 WHERE Customer_id = ${customerId}
             `;
             await runDBCommand(deleteOrdersQuery);
     
-            // Delete the record in Customer
             const deleteCustomerQuery = `
                 DELETE FROM Customer
                 WHERE Customer_id = ${customerId}

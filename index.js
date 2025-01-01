@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const router = express.Router();
 const session = require("express-session");
-const { runDBCommand } = require("./db/connection"); // Шлях до connection.js
+const { runDBCommand } = require("./db/connection"); 
 const bodyParser = require("body-parser");
 const app = express();
 const PORT = 3000;
@@ -16,17 +16,16 @@ app.use(
 
 app.use(
   session({
-    secret: "your-secret-key", // Secret key for session encryption
-    resave: false, // Don't save session if not modified
-    saveUninitialized: true, // Save session even if it hasn't been initialized
-    cookie: { secure: false }, // Set secure to true for HTTPS (default is false)
+    secret: "your-secret-key", 
+    resave: false, 
+    saveUninitialized: true, 
+    cookie: { secure: false }, 
   })
 );
 
 app.use((req, res, next) => {
   if (!req.session.sessionId) {
-    // Automatically set a session ID if it doesn't exist
-    req.session.sessionId = generateSessionId(); // You can customize this ID
+    req.session.sessionId = generateSessionId(); 
   }
   next();
 });
@@ -34,19 +33,16 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Встановлення EJS як шаблонізатора
-app.set("views", path.join(__dirname, "views")); // Шлях до views
+app.set("views", path.join(__dirname, "views")); 
 app.set("view engine", "ejs");
 
-// Налаштування статичних файлів (CSS, зображення тощо)
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/resetSession", async (req, res) => {
   req.session.destroy((err) => {
-    res.redirect("/"); // will always fire after session is destroyed
+    res.redirect("/"); 
   });
 });
-// Product list controller
 app.get("/", async (req, res) => {
   try {
     const session_id = req.session.sessionId;
@@ -141,17 +137,15 @@ app.use("/tables/warehouse-products", warehouseProductsRoutes);
 app.use("/warehouseProduct", warehouseProductsActionRoutes);
 
 app.use("/", router);
-// Запуск сервера
 app.listen(PORT, async () => {
   console.log(`Сервер запущено на http://localhost:${PORT}`);
 
-  // Динамічний імпорт модуля "open" для автоматичного відкриття в браузері
   const open = await import("open");
   await open.default(`http://localhost:${PORT}`);
 });
 
 function generateSessionId() {
-  return "session-" + Math.random().toString(36).substr(2, 9); // Example of custom session ID generation
+  return "session-" + Math.random().toString(36).substr(2, 9); 
 }
 
 module.exports = router;

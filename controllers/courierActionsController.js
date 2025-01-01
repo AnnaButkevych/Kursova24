@@ -60,7 +60,6 @@ module.exports = {
         }
     },
 
-// Видалення кур'єра
 async deleteCourier(req, res) {
     const { Courier_id } = req.params;
 
@@ -70,8 +69,8 @@ async deleteCourier(req, res) {
     `;
 
     try {
-        await runDBCommand(deleteQuery); // Виконання запиту на видалення кур'єра
-        res.json({ success: true }); // Повертаємо успішний статус у відповідь
+        await runDBCommand(deleteQuery); 
+        res.json({ success: true });
     } catch (error) {
         console.error('Error deleting courier:', error);
         res.status(500).json({ success: false, message: 'Error deleting courier' }); // Повертаємо помилку

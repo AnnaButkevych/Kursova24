@@ -20,7 +20,6 @@ module.exports = {
 
         try {
             const results = await runDBCommand(query);
-            // Форматуємо дати у результатах
             const formattedResults = results.map(row => ({
                 ...row,
                 Filtration_date: new Date(row.Filtration_date).toLocaleDateString('uk-UA'),

@@ -378,7 +378,6 @@
         url.searchParams.set('filterBy', filterBy);
         url.searchParams.set('searchQuery', searchQuery);
 
-        // Додаємо кожен вибраний статус як окремий параметр
         orderStatuses.forEach(status => {
             url.searchParams.append('orderStatus', status);
         });

@@ -138,14 +138,13 @@
             const phoneInput = document.getElementById('Phone_number');
             const phoneError = document.getElementById('phoneError');
 
-            // Регулярний вираз для перевірки номера телефону (точно 10 цифр)
             const phoneRegex = /^\d{10}$/;
 
             if (!phoneRegex.test(phoneInput.value)) {
-                event.preventDefault(); // Запобігає відправленню форми
+                event.preventDefault(); 
                 phoneError.textContent = 'Номер телефону має містити рівно 10 цифр!';
             } else {
-                phoneError.textContent = ''; // Очищення помилки
+                phoneError.textContent = ''; 
             }
         });
     </script>

@@ -30,7 +30,6 @@ const busketController = {
         }
     },
 
-  // Get a specific busket item by session_id
     async getBysession(req, res) {
     try {
       const { sessionId } = req.params;

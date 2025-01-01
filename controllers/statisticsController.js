@@ -2,7 +2,6 @@ const { runDBCommand } = require('../db/connection');
 
 module.exports = {
     async getStatistics(req, res) {
-        // Запит для кількості замовлень по місяцях
         const ordersPerMonthQuery = `
             SELECT YEAR(Date) AS Year, MONTH(Date) AS Month, COUNT(*) AS OrderCount
             FROM Orders
@@ -10,7 +9,6 @@ module.exports = {
             ORDER BY Year DESC, Month DESC;
         `;
 
-        // Запит для кількості замовлень за кожним кур'єром
         const ordersByCourierQuery = `
             SELECT c.Name AS CourierName, c.Surname AS CourierSurname, COUNT(o.Orders_id) AS OrderCount
             FROM Orders o
@@ -20,7 +18,6 @@ module.exports = {
             ORDER BY OrderCount DESC; 
         `;
 
-        // Запит для популярності способів оплати
         const paymentMethodPopularityQuery = `
             SELECT pt.Type AS PaymentType, COUNT(o.Orders_id) AS OrderCount
             FROM Orders o

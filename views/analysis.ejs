@@ -126,7 +126,6 @@
           <h2>Аналіз за період</h2>
         </div>
 
-        <!-- Форма для введення діапазону дат -->
         <form action="/analysis" method="get" id="analysisForm">
           <div class="date-range-selector">
             <label for="start-date">Від:</label>
@@ -148,7 +147,6 @@
             <button type="submit" class="analyze-btn">Зробити аналіз</button>
           </div>
           <div class="error-message" id="error-message"></div>
-          <!-- Повідомлення про помилку -->
         </form>
 
         <% if (analysis) { %>
@@ -183,25 +181,23 @@
     </main>
 
     <script>
-      // Валідація форми
       const form = document.getElementById("analysisForm");
       const startDateInput = document.getElementById("start-date");
       const endDateInput = document.getElementById("end-date");
       const errorMessage = document.getElementById("error-message");
 
       form.addEventListener("submit", function (event) {
-        // Перевірка на вибір дат
         if (!startDateInput.value || !endDateInput.value) {
           errorMessage.textContent = "Будь ласка, оберіть діапазон дат.";
-          event.preventDefault(); // Запобігає відправці форми
+          event.preventDefault(); 
         } else if (
           new Date(startDateInput.value) > new Date(endDateInput.value)
         ) {
           errorMessage.textContent =
             'Дата "Від" не може бути пізнішою за "До".';
-          event.preventDefault(); // Запобігає відправці форми
+          event.preventDefault(); 
         } else {
-          errorMessage.textContent = ""; // Очищаємо повідомлення про помилку
+          errorMessage.textContent = ""; 
         }
       });
     </script>

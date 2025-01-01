@@ -161,12 +161,11 @@ h1 {
 </style>
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault();  // Зупиняємо стандартну відправку форми
+            event.preventDefault(); 
 
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            // Відправка даних на сервер через Fetch API
             fetch('/admin/login', {
                 method: 'POST',
                 headers: {

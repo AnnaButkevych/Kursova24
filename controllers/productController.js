@@ -1,7 +1,6 @@
 const { runDBCommand } = require("../db/connection");
 
 const productController = {
-    // Отримати всі продукти
     async getAll(req, res) {
         try {
             const query = "SELECT * FROM Product";
@@ -13,7 +12,6 @@ const productController = {
         }
     },
 
-    // Отримання кількості продукту на складі
     getProductQuantity: async (req, res) => {
         const { productId } = req.params;
         const query = `
@@ -35,7 +33,6 @@ const productController = {
         }
     },
 
-    // Отримати продукт за ID
     async getById(req, res) {
         const { productId } = req.params;
 
@@ -58,7 +55,6 @@ const productController = {
         }
     },
 
-    // Додати новий продукт
     async add(req, res) {
         const { Product_name, Storage_unit, Details } = req.body;
 
@@ -80,7 +76,6 @@ const productController = {
         }
     },
 
-    // Оновити продукт
     async update(req, res) {
         const { productId } = req.params;
         const { Product_name, Storage_unit, Details } = req.body;
@@ -110,7 +105,6 @@ const productController = {
         }
     },
 
-    // Перевірка кількості продуктів в кошику перед оформленням замовлення
     checkBusketQuantities: async (req, res) => {
         const sessionId = req.session.sessionId;
         const query = `
@@ -145,10 +139,9 @@ const productController = {
         }
     },
 
-    // Оновлення складу після оформлення замовлення
     updateProductStock: async (req, res) => {
         const { productId } = req.params;
-        const { quantity } = req.body; // кількість замовленого товару
+        const { quantity } = req.body; 
 
         const query = `
             UPDATE ProductsOnWarehouse
@@ -170,9 +163,8 @@ const productController = {
         }
     },
 
-    // Оновлення складу для всіх товарів після оформлення замовлення
     updateStocksAfterOrder: async (req, res) => {
-        const items = req.body.items; // отримуємо масив продуктів і кількостей
+        const items = req.body.items; 
 
         try {
             for (let item of items) {
@@ -190,7 +182,6 @@ const productController = {
         }
     },
 
-    // Видалити продукт
     async delete(req, res) {
         const { productId } = req.params;
 

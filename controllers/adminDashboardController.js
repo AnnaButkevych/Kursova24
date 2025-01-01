@@ -2,9 +2,7 @@ const { runDBCommand } = require('../db/connection');
 
 module.exports = {
     async getDashboardData(req, res) {
-        const { filterBy, searchQuery, orderStatus } = req.query; // Отримуємо параметри
-
-        // Базовий SQL-запит
+        const { filterBy, searchQuery, orderStatus } = req.query; 
         let query = `
             SELECT 
                 o.Orders_id, 
@@ -19,33 +17,25 @@ module.exports = {
             JOIN Payment_type pt ON o.Payment_type_id = pt.Payment_type_id
         `;
 
-        // Масив для динамічних умов WHERE
         const conditions = [];
 
-        // Додавання пошуку
         if (searchQuery) {
             conditions.push(`(o.Status LIKE '%${searchQuery}%' OR c.Name LIKE '%${searchQuery}%' OR c.Surname LIKE '%${searchQuery}%')`);
         }
 
-        // Додавання фільтрації за статусом
         if (orderStatus) {
-            // Перевіряємо, чи orderStatus є масивом
             if (Array.isArray(orderStatus)) {
-                // Якщо це масив, створюємо умову IN
                 const statuses = orderStatus.map(status => `'${status}'`).join(', ');
                 conditions.push(`o.Status IN (${statuses})`);
             } else {
-                // Якщо це одне значення, додаємо як звичайну умову
                 conditions.push(`o.Status = '${orderStatus}'`);
             }
         }
 
-        // Додавання умов WHERE (якщо є)
         if (conditions.length > 0) {
             query += ` WHERE ${conditions.join(' AND ')}`;
         }
 
-        // Додавання сортування
         if (filterBy === 'date-asc') {
             query += ' ORDER BY o.Date ASC';
         } else if (filterBy === 'date-desc') {
@@ -55,7 +45,7 @@ module.exports = {
         } else if (filterBy === 'sum-desc') {
             query += ' ORDER BY o.Sum DESC';
         } else {
-            query += ' ORDER BY o.Date DESC'; // Сортування за замовчуванням
+            query += ' ORDER BY o.Date DESC';
         }
 
         try {
@@ -64,9 +54,9 @@ module.exports = {
             res.status(200).render('adminDashboard', {
                 success: true,
                 orders: ordersDetails,
-                filterBy: filterBy || '', // Передаємо активний фільтр
-                searchQuery: searchQuery || '', // Передаємо пошуковий запит
-                orderStatus: orderStatus || '' // Передаємо активний статус
+                filterBy: filterBy || '', 
+                searchQuery: searchQuery || '', 
+                orderStatus: orderStatus || ''
             });
         } catch (error) {
             console.error('Error in getDashboardData:', error);
@@ -76,11 +66,9 @@ module.exports = {
             });
         }
     },
-    // Отримання форми редагування замовлення
     async getEditOrderForm(req, res) {
         const orderId = req.params.id;
 
-        // Масиви з можливими статусами та типами оплати
         const statusOptions = ['очікує оплати', 'виконане', 'скасоване'];
         const paymentTypeOptions = ['готівка', 'картка', 'PayPal'];
 
@@ -116,7 +104,6 @@ module.exports = {
         }
     },
 
-    // Оновлення замовлення
     async updateOrder(req, res) {
         const orderId = req.params.id;
         const { Date, Status, Sum, PaymentType } = req.body;
@@ -138,7 +125,6 @@ module.exports = {
         }
     },
 
-    // Видалення замовлення
     async deleteOrder(req, res) {
         const orderId = req.params.id;
         try {

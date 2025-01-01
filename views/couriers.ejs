@@ -196,24 +196,20 @@
 
         deleteButtons.forEach((button) => {
           button.addEventListener("click", function () {
-            // Get the data attributes from the clicked button
             const courierId = this.dataset.courierId;
             const courierName = this.dataset.courierName;
             const courierSurname = this.dataset.courierSurname;
 
-            // Check if the data attributes exist and are not undefined
             if (!courierName || !courierSurname) {
               console.error("Courier name or surname is missing.");
               return;
             }
 
-            // Ask for confirmation before deleting
             if (
               confirm(
                 `Ви впевнені, що хочете видалити кур'єра: ${courierName} ${courierSurname}?`
               )
             ) {
-              // Send DELETE request via AJAX
               fetch(`/courierActions/delete/${courierId}`, {
                 method: "DELETE",
                 headers: {
@@ -224,7 +220,6 @@
                 .then((data) => {
                   if (data.success) {
                     alert("Кур'єр успішно видалений!");
-                    // Remove the row from the table without refreshing the page
                     document
                       .querySelector(`[data-courier-id="${courierId}"]`)
                       .remove();

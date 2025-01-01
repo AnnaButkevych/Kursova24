@@ -6,7 +6,6 @@ const loginPage = async (req, res) => {
     });
 };
 
-// Пошук адміністратора за ім'ям користувача
 const findAdminByUsername = async (username) => {
     const query = `
         SELECT * FROM AdminUser
@@ -22,7 +21,6 @@ const findAdminByUsername = async (username) => {
     }
 };
 
-// Логін адміністратора
 const loginAdmin = async (req, res) => {
     const { username, password } = req.body;
     

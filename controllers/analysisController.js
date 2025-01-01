@@ -6,7 +6,6 @@ module.exports = {
 
         let analysis = null;
 
-        // Якщо дати передані, виконуємо запит для аналізу
         if (startDate && endDate) {
             const query = `
                 SELECT COUNT(*) AS OrderCount, SUM(Sum) AS TotalAmount
@@ -15,9 +14,8 @@ module.exports = {
             `;
         
             try {
-                analysis = await runDBCommand(query); // Виконання запиту
+                analysis = await runDBCommand(query); 
                 if (analysis[0]) {
-                    // Перевіряємо, чи є TotalAmount
                     analysis[0].TotalAmount = parseFloat(analysis[0].TotalAmount) || 0; // Перетворюємо на число
                 }
             } catch (error) {
