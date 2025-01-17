@@ -16,7 +16,7 @@ module.exports = {
             try {
                 analysis = await runDBCommand(query); 
                 if (analysis[0]) {
-                    analysis[0].TotalAmount = parseFloat(analysis[0].TotalAmount) || 0; // Перетворюємо на число
+                    analysis[0].TotalAmount = parseFloat(analysis[0].TotalAmount) || 0; 
                 }
             } catch (error) {
                 console.error('Error fetching analysis:', error);
